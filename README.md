@@ -411,7 +411,7 @@ Implementation Generation • Testing • Documentation
 
 ```bash
 # 🚀 Install DeepCode package directly
-pip install deepcode
+pip install deepcode-hku
 
 # 🔑 Download configuration files
 curl -O https://raw.githubusercontent.com/HKUDS/DeepCode/main/mcp_agent.config.yaml
