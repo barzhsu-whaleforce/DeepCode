@@ -27,7 +27,7 @@ def display_header():
 
 def display_features():
     """Display DeepCode AI Agent capabilities"""
-    # AI Agent core capabilities display area - simplified version to avoid conflicts with main header
+    # AI Agent core capabilities display area - updated to match README content
     st.markdown(
         """
     <div class="ai-capabilities-section">
@@ -36,8 +36,8 @@ def display_features():
             <div class="neuron pulse-2"></div>
             <div class="neuron pulse-3"></div>
         </div>
-        <h2 class="capabilities-title">🤖 AI Agent Core Capabilities</h2>
-        <p class="capabilities-subtitle">Advanced Neural Code Intelligence</p>
+        <h2 class="capabilities-title">🧠 Open Agentic Coding Platform</h2>
+        <p class="capabilities-subtitle">Advancing Code Generation with Multi-Agent Systems</p>
     </div>
     """,
         unsafe_allow_html=True,
@@ -60,42 +60,42 @@ def display_features():
                 <div class="feature-icon-large">🚀</div>
             </div>
             <div class="feature-header-content">
-                <h3 class="feature-title-large">Paper2Code: Algorithm Implementation</h3>
+                <h3 class="feature-title-large">Paper2Code: Research-to-Production Pipeline</h3>
                 <p class="feature-subtitle">Automated Implementation of Complex Algorithms</p>
             </div>
             <div class="feature-stats">
                 <div class="stat-item">
-                    <span class="stat-number typing-number">98%</span>
-                    <span class="stat-label">Accuracy</span>
+                    <span class="stat-number typing-number">Multi-Modal</span>
+                    <span class="stat-label">Analysis</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-number typing-number">10x</span>
-                    <span class="stat-label">Faster</span>
+                    <span class="stat-number typing-number">Production</span>
+                    <span class="stat-label">Ready</span>
                 </div>
             </div>
         </div>
         <div class="feature-content">
             <div class="content-left">
-                <p class="feature-description-large">Effortlessly converts complex algorithms from research papers into high-quality, production-ready code, accelerating algorithm reproduction with unprecedented precision.</p>
+                <p class="feature-description-large">Multi-modal document analysis engine that extracts algorithmic logic and mathematical models from academic papers, generating optimized implementations with proper data structures while preserving computational complexity characteristics.</p>
                 <div class="feature-flow">
                     <div class="flow-step active">
-                        <div class="flow-icon">🔍</div>
-                        <span>Paper Analysis</span>
+                        <div class="flow-icon">📄</div>
+                        <span>Document Parsing</span>
                     </div>
                     <div class="flow-arrow">→</div>
                     <div class="flow-step active">
                         <div class="flow-icon">🧠</div>
-                        <span>Method Extraction</span>
+                        <span>Algorithm Extraction</span>
                     </div>
                     <div class="flow-arrow">→</div>
                     <div class="flow-step active">
                         <div class="flow-icon">⚡</div>
-                        <span>Code Generation</span>
+                        <span>Code Synthesis</span>
                     </div>
                     <div class="flow-arrow">→</div>
-                    <div class="flow-step">
+                    <div class="flow-step active">
                         <div class="flow-icon">✅</div>
-                        <span>Validation</span>
+                        <span>Quality Assurance</span>
                     </div>
                 </div>
             </div>
@@ -108,8 +108,8 @@ def display_features():
                     <div class="code-lines">
                         <div class="code-line typing">import torch</div>
                         <div class="code-line typing delay-1">import torch.nn as nn</div>
-                        <div class="code-line typing delay-2">class DeepNetwork(nn.Module):</div>
-                        <div class="code-line typing delay-3">    def __init__(self):</div>
+                        <div class="code-line typing delay-2">class ResearchAlgorithm(nn.Module):</div>
+                        <div class="code-line typing delay-3">    def __init__(self, config):</div>
                         <div class="code-line typing delay-4">        super().__init__()</div>
                     </div>
                 </div>
@@ -137,43 +137,43 @@ def display_features():
                 <div class="feature-icon-large">🎨</div>
             </div>
             <div class="feature-header-content">
-                <h3 class="feature-title-large">Text2Web: Front-End Development</h3>
-                <p class="feature-subtitle">Automated Front-End Web Development</p>
+                <h3 class="feature-title-large">Text2Web: Automated Prototyping Engine</h3>
+                <p class="feature-subtitle">Natural Language to Front-End Code Synthesis</p>
             </div>
             <div class="feature-stats">
                 <div class="stat-item">
-                    <span class="stat-number typing-number">100%</span>
-                    <span class="stat-label">Functional</span>
+                    <span class="stat-number typing-number">Intelligent</span>
+                    <span class="stat-label">Scaffolding</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-number typing-number">Modern</span>
-                    <span class="stat-label">Design</span>
+                    <span class="stat-number typing-number">Scalable</span>
+                    <span class="stat-label">Architecture</span>
                 </div>
             </div>
         </div>
         <div class="feature-content">
             <div class="content-left">
-                <p class="feature-description-large">Translates plain textual descriptions into fully functional, visually appealing front-end web code, enabling rapid and intuitive web interface creation.</p>
+                <p class="feature-description-large">Context-aware code generation using fine-tuned language models. Intelligent scaffolding system generating complete application structures including frontend components, maintaining architectural consistency across modules.</p>
                 <div class="agent-grid">
                     <div class="agent-card active">
-                        <div class="agent-avatar">💬</div>
-                        <h4>Text Analyzer</h4>
-                        <p>Understands requirements</p>
+                        <div class="agent-avatar">📝</div>
+                        <h4>Intent Understanding</h4>
+                        <p>Semantic analysis of requirements</p>
                     </div>
                     <div class="agent-card active">
                         <div class="agent-avatar">🎨</div>
-                        <h4>UI Designer</h4>
-                        <p>Creates visual design</p>
+                        <h4>UI Architecture</h4>
+                        <p>Component design & structure</p>
                     </div>
                     <div class="agent-card active">
                         <div class="agent-avatar">💻</div>
-                        <h4>Code Generator</h4>
-                        <p>Builds web interface</p>
+                        <h4>Code Generation</h4>
+                        <p>Functional interface creation</p>
                     </div>
-                    <div class="agent-card">
+                    <div class="agent-card active">
                         <div class="agent-avatar">✨</div>
-                        <h4>UX Optimizer</h4>
-                        <p>Enhances user experience</p>
+                        <h4>Quality Assurance</h4>
+                        <p>Automated testing & validation</p>
                     </div>
                 </div>
             </div>
@@ -181,12 +181,12 @@ def display_features():
                 <div class="collaboration-viz">
                     <div class="collaboration-center">
                         <div class="center-node">🎯</div>
-                        <span>Target Paper</span>
+                        <span>Web Application</span>
                     </div>
                     <div class="collaboration-agents">
                         <div class="collab-agent agent-pos-1">
                             <div class="pulse-ring"></div>
-                            🔬
+                            📝
                         </div>
                         <div class="collab-agent agent-pos-2">
                             <div class="pulse-ring"></div>
@@ -227,35 +227,35 @@ def display_features():
                 <div class="feature-icon-large">⚙️</div>
             </div>
             <div class="feature-header-content">
-                <h3 class="feature-title-large">Text2Backend: Server Development</h3>
-                <p class="feature-subtitle">Automated Back-End Development</p>
+                <h3 class="feature-title-large">Text2Backend: Scalable Architecture Generator</h3>
+                <p class="feature-subtitle">Intelligent Server-Side Development</p>
             </div>
             <div class="feature-stats">
                 <div class="stat-item">
-                    <span class="stat-number typing-number">Scalable</span>
-                    <span class="stat-label">Architecture</span>
+                    <span class="stat-number typing-number">Database</span>
+                    <span class="stat-label">Integration</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-number typing-number">APIs</span>
-                    <span class="stat-label">Ready</span>
+                    <span class="stat-number typing-number">API</span>
+                    <span class="stat-label">Endpoints</span>
                 </div>
             </div>
         </div>
         <div class="feature-content">
             <div class="content-left">
-                <p class="feature-description-large">Generates efficient, scalable, and feature-rich back-end code from simple text inputs, streamlining server-side development and integration.</p>
+                <p class="feature-description-large">Generates efficient, scalable backend systems with database schemas, API endpoints, and microservices architecture. Uses dependency analysis to ensure scalable architecture from initial generation with comprehensive testing.</p>
                 <div class="vision-demo">
                     <div class="demo-input">
                         <div class="input-icon">💬</div>
-                        <div class="input-text typing">"Create a REST API for user authentication with JWT tokens"</div>
+                        <div class="input-text typing">"Build a scalable e-commerce API with user authentication and payment processing"</div>
                     </div>
                     <div class="demo-arrow">⬇️</div>
                     <div class="demo-output">
                         <div class="output-items">
-                            <div class="output-item">⚙️ Scalable Backend APIs</div>
-                            <div class="output-item">🔒 Security & Authentication</div>
-                            <div class="output-item">🗄️ Database Integration</div>
-                            <div class="output-item">📊 Monitoring & Logging</div>
+                            <div class="output-item">🏗️ Microservices Architecture</div>
+                            <div class="output-item">🔒 Authentication & Security</div>
+                            <div class="output-item">🗄️ Database Schema Design</div>
+                            <div class="output-item">📊 API Documentation & Testing</div>
                         </div>
                     </div>
                 </div>
@@ -265,29 +265,29 @@ def display_features():
                     <div class="timeline-item completed">
                         <div class="timeline-marker">✅</div>
                         <div class="timeline-content">
-                            <h4>API Architecture</h4>
-                            <p>REST & GraphQL</p>
+                            <h4>API Design</h4>
+                            <p>RESTful endpoints</p>
                         </div>
                     </div>
                     <div class="timeline-item completed">
                         <div class="timeline-marker">✅</div>
                         <div class="timeline-content">
                             <h4>Database Layer</h4>
-                            <p>ORM & Queries</p>
+                            <p>Schema & relationships</p>
                         </div>
                     </div>
                     <div class="timeline-item active">
                         <div class="timeline-marker">🔄</div>
                         <div class="timeline-content">
-                            <h4>Microservices</h4>
-                            <p>Scalable architecture</p>
+                            <h4>Security Layer</h4>
+                            <p>Authentication & authorization</p>
                         </div>
                     </div>
                     <div class="timeline-item future">
                         <div class="timeline-marker">🚀</div>
                         <div class="timeline-content">
-                            <h4>Cloud Integration</h4>
-                            <p>Auto-deployment</p>
+                            <h4>Deployment</h4>
+                            <p>CI/CD integration</p>
                         </div>
                     </div>
                 </div>
@@ -311,51 +311,51 @@ def display_features():
                         <div class="star star-3">⚡</div>
                     </div>
                     <div class="community-nodes">
-                        <div class="community-node">🚀</div>
-                        <div class="community-node">🎨</div>
+                        <div class="community-node">🧠</div>
+                        <div class="community-node">🔍</div>
                         <div class="community-node">⚙️</div>
                     </div>
                 </div>
                 <div class="feature-icon-large">🎯</div>
             </div>
             <div class="feature-header-content">
-                <h3 class="feature-title-large">Unified Development Workflow</h3>
-                <p class="feature-subtitle">Multi-Agent Processing Engine</p>
+                <h3 class="feature-title-large">CodeRAG Integration System</h3>
+                <p class="feature-subtitle">Advanced Multi-Agent Orchestration</p>
             </div>
             <div class="feature-stats">
                 <div class="stat-item">
-                    <span class="stat-number typing-number">Input</span>
-                    <span class="stat-label">Any Format</span>
+                    <span class="stat-number typing-number">Global</span>
+                    <span class="stat-label">Code Analysis</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-number typing-number">Complete</span>
-                    <span class="stat-label">Solution</span>
+                    <span class="stat-number typing-number">Intelligent</span>
+                    <span class="stat-label">Orchestration</span>
                 </div>
             </div>
         </div>
         <div class="feature-content">
             <div class="content-left">
-                <p class="feature-description-large">Unified workflow that processes any input format through AI multi-agent engine to deliver complete solution output including algorithm code, frontend apps, and backend APIs.</p>
+                <p class="feature-description-large">Advanced retrieval-augmented generation combining semantic vector embeddings with graph-based dependency analysis. Central orchestrating agent coordinates specialized agents with dynamic task planning and intelligent memory management.</p>
                 <div class="community-features">
                     <div class="community-feature">
-                        <div class="feature-icon-small">📄</div>
+                        <div class="feature-icon-small">🧠</div>
                         <div class="feature-text">
-                            <h4>Input Any Format</h4>
-                            <p>Research papers, text requirements, documentation</p>
+                            <h4>Intelligent Orchestration</h4>
+                            <p>Central decision-making with dynamic planning algorithms</p>
                         </div>
                     </div>
                     <div class="community-feature">
-                        <div class="feature-icon-small">🤖</div>
+                        <div class="feature-icon-small">🔍</div>
                         <div class="feature-text">
-                            <h4>AI Multi-Agent Processing</h4>
-                            <p>Intelligent orchestration engine coordination</p>
+                            <h4>CodeRAG System</h4>
+                            <p>Semantic analysis with dependency graph mapping</p>
                         </div>
                     </div>
                     <div class="community-feature">
                         <div class="feature-icon-small">⚡</div>
                         <div class="feature-text">
-                            <h4>Complete Solution Output</h4>
-                            <p>Algorithm code, frontend apps, backend APIs</p>
+                            <h4>Quality Assurance</h4>
+                            <p>Automated testing, validation, and documentation</p>
                         </div>
                     </div>
                 </div>
@@ -364,24 +364,24 @@ def display_features():
                 <div class="tech-ecosystem">
                     <div class="ecosystem-center">
                         <div class="center-logo">🧠</div>
-                        <span>DeepCode Engine</span>
+                        <span>Multi-Agent Engine</span>
                     </div>
                     <div class="ecosystem-ring">
                         <div class="ecosystem-item item-1">
-                            <div class="item-icon">🚀</div>
-                            <span>Algorithm Code</span>
+                            <div class="item-icon">🎯</div>
+                            <span>Central Orchestration</span>
                         </div>
                         <div class="ecosystem-item item-2">
-                            <div class="item-icon">🎨</div>
-                            <span>Frontend Apps</span>
+                            <div class="item-icon">📝</div>
+                            <span>Intent Understanding</span>
                         </div>
                         <div class="ecosystem-item item-3">
-                            <div class="item-icon">⚙️</div>
-                            <span>Backend APIs</span>
+                            <div class="item-icon">🔍</div>
+                            <span>Code Mining & Indexing</span>
                         </div>
                         <div class="ecosystem-item item-4">
-                            <div class="item-icon">📚</div>
-                            <span>Documentation</span>
+                            <div class="item-icon">🧬</div>
+                            <span>Code Generation</span>
                         </div>
                     </div>
                 </div>
