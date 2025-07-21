@@ -753,7 +753,7 @@ async def check_url_accessible(url: str) -> Dict[str, Any]:
                     "content_type": response.headers.get("Content-Type", ""),
                     "content_length": response.headers.get("Content-Length", 0),
                 }
-    except:
+    except Exception:
         return {
             "accessible": False,
             "status": 0,
@@ -775,7 +775,6 @@ async def download_file(url: str, destination: str) -> Dict[str, Any]:
                 response.raise_for_status()
 
                 # 获取文件信息
-                total_size = int(response.headers.get("Content-Length", 0))
                 content_type = response.headers.get(
                     "Content-Type", "application/octet-stream"
                 )
@@ -1264,7 +1263,7 @@ async def convert_document_to_markdown(
     try:
         parsed = urlparse(file_path)
         is_url_input = parsed.scheme in ("http", "https")
-    except:
+    except Exception:
         is_url_input = False
 
     # 检查文件是否存在（如果不是URL）

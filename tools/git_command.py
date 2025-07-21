@@ -126,7 +126,7 @@ async def check_git_installed() -> bool:
         )
         await proc.wait()
         return proc.returncode == 0
-    except:
+    except Exception:
         return False
 
 

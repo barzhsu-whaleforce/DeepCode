@@ -14,38 +14,35 @@ from pathlib import Path
 
 def check_dependencies():
     """Check if necessary dependencies are installed"""
+    import importlib.util
+    
     print("🔍 Checking dependencies...")
 
     missing_deps = []
     missing_system_deps = []
 
-    try:
-        import streamlit
-
+    # Check Streamlit availability
+    if importlib.util.find_spec("streamlit") is not None:
         print("✅ Streamlit is installed")
-    except ImportError:
+    else:
         missing_deps.append("streamlit>=1.28.0")
 
-    try:
-        import yaml
-
+    # Check PyYAML availability
+    if importlib.util.find_spec("yaml") is not None:
         print("✅ PyYAML is installed")
-    except ImportError:
+    else:
         missing_deps.append("pyyaml")
 
-    try:
-        import asyncio
-
+    # Check asyncio availability
+    if importlib.util.find_spec("asyncio") is not None:
         print("✅ Asyncio is available")
-    except ImportError:
+    else:
         missing_deps.append("asyncio")
 
     # Check PDF conversion dependencies
-    try:
-        import reportlab
-
+    if importlib.util.find_spec("reportlab") is not None:
         print("✅ ReportLab is installed (for text-to-PDF conversion)")
-    except ImportError:
+    else:
         missing_deps.append("reportlab")
         print("⚠️  ReportLab not found (text files won't convert to PDF)")
 
