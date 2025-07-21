@@ -13,7 +13,7 @@ __description__ = (
 )
 
 # Import main components for easy access
-from .utils import FileProcessor, DialogueLogger
+from utils import FileProcessor, DialogueLogger
 
 __all__ = [
     "FileProcessor",
