@@ -15,7 +15,7 @@ from pathlib import Path
 def check_dependencies():
     """Check if necessary dependencies are installed"""
     import importlib.util
-    
+
     print("🔍 Checking dependencies...")
 
     missing_deps = []

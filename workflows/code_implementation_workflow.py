@@ -363,9 +363,6 @@ Requirements:
         start_time = time.time()
         max_time = 2400  # 40 minutes
 
-        # Sliding window configuration
-        WINDOW_SIZE = 1
-        SUMMARY_TRIGGER = 8
 
         # Initialize specialized agents
         code_agent = CodeImplementationAgent(
@@ -390,10 +387,6 @@ Requirements:
         # Initialize memory agent with iteration 0
         memory_agent.start_new_round(iteration=0)
 
-        # Preserve initial plan (never compressed)
-        initial_plan_message = messages[0] if messages else None
-
-        # Initial setup logging removed
 
         while iteration < max_iterations:
             iteration += 1
@@ -442,14 +435,6 @@ Requirements:
                     )
 
                 # NEW LOGIC: Check if write_file was called and trigger memory optimization immediately
-                write_file_detected = any(
-                    tool_call["name"] == "write_file"
-                    for tool_call in response["tool_calls"]
-                )
-                # if write_file_detected:
-                #     self.logger.info(f"🔄 write_file detected - preparing memory optimization for next round")
-
-                # Tool results logged via standard logger only
 
                 # Determine guidance based on results
                 has_error = self._check_tool_results_for_errors(tool_results)
@@ -467,9 +452,7 @@ Requirements:
                 if memory_agent.should_trigger_memory_optimization(
                     messages, code_agent.get_files_implemented_count()
                 ):
-                    # Capture messages before optimization
-                    messages_before_optimization = messages.copy()
-                    messages_before_count = len(messages)
+
 
                     # Memory optimization triggered
 
@@ -479,15 +462,9 @@ Requirements:
                     messages = memory_agent.apply_memory_optimization(
                         current_system_message, messages, files_implemented_count
                     )
-                    messages_after_count = len(messages)
+         
 
-                    compression_ratio = (
-                        (messages_before_count - messages_after_count)
-                        / messages_before_count
-                        * 100
-                        if messages_before_count > 0
-                        else 0
-                    )
+   
 
                     # Memory optimization completed
 
@@ -548,21 +525,11 @@ Requirements:
                     "Emergency message trim - applying concise memory optimization"
                 )
 
-                # Capture messages before emergency optimization
-                messages_before_emergency = messages.copy()
-                messages_before_count = len(messages)
-
-                # Emergency memory optimization triggered
-
-                # Apply emergency memory optimization
                 current_system_message = code_agent.get_system_prompt()
                 files_implemented_count = code_agent.get_files_implemented_count()
                 messages = memory_agent.apply_memory_optimization(
                     current_system_message, messages, files_implemented_count
                 )
-                messages_after_count = len(messages)
-
-                # Emergency optimization completed
 
         return await self._generate_pure_code_final_report_with_concise_agents(
             iteration, time.time() - start_time, code_agent, memory_agent

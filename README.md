@@ -73,9 +73,7 @@
 </tr>
 </table>
 
-<div align="center" style="margin: 30px 0;">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=14&duration=1500&pause=300&color=00D4FF&center=true&vCenter=true&repeat=true&width=800&height=50&lines=🖥️+Choose+Your+Preferred+Interface;⚡+Both+Powered+by+Multi-Agent+AI;🎯+Same+Power%2C+Different+Experience;🚀+Start+Development+Your+Way" alt="Interface Features" />
-</div>
+
 
 
 
@@ -121,9 +119,7 @@
 <p align="center">Effortlessly converts complex algorithms from research papers into <strong>high-quality</strong>, <strong>production-ready</strong> code, accelerating algorithm reproduction.</p>
 </div>
 
-<div align="center" style="margin-top: 20px;">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=9&duration=1500&pause=300&color=FF6B6B&center=true&vCenter=true&repeat=true&width=220&height=20&lines=📄+Papers+→+⚡+Code;🧮+Algorithm+Magic" alt="Paper2Code Stats" />
-</div>
+
 
 </td>
 <td width="30%" align="center" style="vertical-align: top; padding: 20px;">
@@ -144,9 +140,7 @@
 <p align="center">Translates plain textual descriptions into <strong>fully functional</strong>, <strong>visually appealing</strong> front-end web code for rapid interface creation.</p>
 </div>
 
-<div align="center" style="margin-top: 20px;">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=9&duration=1500&pause=300&color=4ECDC4&center=true&vCenter=true&repeat=true&width=220&height=20&lines=💬+Text+→+🎨+UI;🌟+Modern+Design" alt="Text2Web Stats" />
-</div>
+
 
 </td>
 <td width="30%" align="center" style="vertical-align: top; padding: 20px;">
@@ -167,9 +161,7 @@
 <p align="center">Generates <strong>efficient</strong>, <strong>scalable</strong>, and <strong>feature-rich</strong> back-end code from simple text inputs, streamlining server-side development.</p>
 </div>
 
-<div align="center" style="margin-top: 20px;">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=9&duration=1500&pause=300&color=9B59B6&center=true&vCenter=true&repeat=true&width=220&height=20&lines=🔧+Scalable+Tech;🚀+Production+" alt="Text2Backend Stats" />
-</div>
+
 
 </td>
 </tr>
@@ -393,9 +385,7 @@ Implementation Generation • Testing • Documentation
 
 ## 🚀 Quick Start
 
-<div align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Orbitron&size=18&duration=2000&pause=800&color=00FF41&center=true&vCenter=true&multiline=true&width=600&height=60&lines=🚀+GET+STARTED+IN+3+STEPS;📦+Install+→+⚡+Launch+→+🎯+Generate" alt="Quick Start Animation" />
-</div>
+
 
 ### 📦 **Step 1: Installation**
 
@@ -480,15 +470,11 @@ python cli/main_cli.py
 
 ## 💡 Examples
 
-<div align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Orbitron&size=18&duration=2000&pause=800&color=FD79A8&center=true&vCenter=true&multiline=true&width=600&height=60&lines=💡+EXAMPLES;🎬+Live+Demonstrations;📝+Documentation" alt="Examples Header" />
-</div>
+
 
 ### 🎬 **Live Demonstrations**
 
-<div align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Orbitron&size=16&duration=2000&pause=600&color=00D4FF&center=true&vCenter=true&multiline=true&width=600&height=50&lines=🚀+See+DeepCode+in+Action;⚡+Real-World+Use+Cases" alt="Video Demos Header" />
-</div>
+
 
 <table align="center">
 <tr>
@@ -543,9 +529,7 @@ python cli/main_cli.py
 </tr>
 </table>
 
-<div align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=14&duration=1500&pause=300&color=FD79A8&center=true&vCenter=true&repeat=true&width=800&height=50&lines=🎥+Click+to+Watch+Live+Demos;⚡+Real-time+Code+Generation;🎯+Production-Ready+Results;🧬+AI-Powered+Development" alt="Demo Features" />
-</div>
+
 
 ### 🚀 **Coming Soon**
 
@@ -590,8 +574,6 @@ We're continuously enhancing DeepCode with exciting new features:
 
 <div align="center">
 
-<img src="https://readme-typing-svg.herokuapp.com?font=Orbitron&size=20&duration=2000&pause=1000&color=00D4FF&center=true&vCenter=true&multiline=true&width=700&height=80&lines=🚀+Ready+to+Transform+Development%3F;🧬+Join+the+AI+Revolution" alt="Call to Action" />
-
 <p>
   <a href="#-quick-start"><img src="https://img.shields.io/badge/🚀_Get_Started-00d4ff?style=for-the-badge&logo=rocket&logoColor=white" alt="Get Started"></a>
   <a href="https://github.com/HKUDS"><img src="https://img.shields.io/badge/🏛️_View_on_GitHub-00d4ff?style=for-the-badge&logo=github&logoColor=white" alt="View on GitHub"></a>
@@ -608,7 +590,7 @@ We're continuously enhancing DeepCode with exciting new features:
 
 ---
 
-<img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=14&duration=1200&pause=300&color=00D4FF&center=true&vCenter=true&repeat=true&width=800&height=60&lines=🧬+Built+with+❤️+by+Data+Intelligence+Lab+%40+HKU;⚡+Revolutionizing+Software+Development;🚀+Through+Collaborative+AI+Intelligence;🌟+The+Future+of+Agentic+Programming" alt="Footer Animation" />
+
 
 <img src="https://visitor-badge.laobi.icu/badge?page_id=deepcode.readme&style=for-the-badge&color=00d4ff" alt="Visitors">
 

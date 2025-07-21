@@ -340,7 +340,6 @@ class ConciseMemoryAgent:
         Returns:
             Fallback summary
         """
-        current_round = self.current_round
         # Create formatted list of implemented files
         implemented_files_list = (
             "\n".join([f"- {file}" for file in self.implemented_files])
@@ -484,7 +483,6 @@ class ConciseMemoryAgent:
         if tool_name == "write_file":
             self.last_write_file_detected = True
             self.should_clear_memory_next = True
-            file_path = tool_input.get("file_path", "unknown")
             # self.logger.info(f"🔄 WRITE_FILE DETECTED: {file_path} - Memory will be cleared in next round")
 
         # Only record specific tools that provide essential information

@@ -557,6 +557,7 @@ class PDFConverter:
 
         # Check ReportLab
         import importlib.util
+
         if importlib.util.find_spec("reportlab") is not None:
             results["reportlab"] = True
 
