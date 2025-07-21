@@ -235,7 +235,7 @@ async def main():
         print(f"\n{Colors.WARNING}⚠️  Application interrupted by user{Colors.ENDC}")
         sys.exit(1)
     except Exception as e:
-        print(f"\n{Colors.FAIL}❌ Application error: {str(e)}{Colors.ENDC}")
+        print(f"\n{Colors.FAIL}❌ Application errors: {str(e)}{Colors.ENDC}")
         sys.exit(1)
 
 

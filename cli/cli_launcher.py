@@ -89,8 +89,7 @@ def print_banner():
 ║                                                              ║
 ║    ⚡ DATA INTELLIGENCE LAB @ HKU ⚡                        ║
 ║                                                              ║
-║    Revolutionizing research reproducibility                  ║
-║    Command Line Interface Edition                           ║
+║                               ║
 ║                                                              ║
 ╚══════════════════════════════════════════════════════════════╝
 """
