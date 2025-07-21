@@ -414,7 +414,9 @@ class CodeImplementationAgent:
                         self.get_files_implemented_count(),  # Pass the current file count
                     )
 
-                    # self.logger.info(f"Created code summary for implemented file: {file_path}")
+                    self.logger.info(
+                        f"Created code summary for implemented file: {file_path}, summary: {summary[:100]}..."
+                    )
                 else:
                     self.logger.warning(
                         "Missing file path or content for summary generation"
@@ -512,7 +514,7 @@ class CodeImplementationAgent:
         except Exception as e:
             self.logger.warning(f"Failed to track file implementation: {e}")
             # Even if tracking fails, try to count based on tool input (but check for duplicates) / 即使跟踪失败，也尝试根据工具输入计数（但检查重复）
-            
+
             file_path = tool_call["input"].get("file_path")
             if file_path and file_path not in self.implemented_files_set:
                 self.implemented_files_set.add(file_path)
@@ -520,7 +522,6 @@ class CodeImplementationAgent:
                 self.logger.info(
                     f"File implementation counted (emergency fallback): count={self.files_implemented_count}, file={file_path}"
                 )
-           
 
     def _track_dependency_analysis(self, tool_call: Dict, result: Any):
         """

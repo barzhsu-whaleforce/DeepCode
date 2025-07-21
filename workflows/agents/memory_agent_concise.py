@@ -483,7 +483,7 @@ class ConciseMemoryAgent:
         if tool_name == "write_file":
             self.last_write_file_detected = True
             self.should_clear_memory_next = True
-            
+
             # self.logger.info(f"🔄 WRITE_FILE DETECTED: {file_path} - Memory will be cleared in next round")
 
         # Only record specific tools that provide essential information

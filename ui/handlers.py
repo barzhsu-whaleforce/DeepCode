@@ -169,7 +169,6 @@ def run_async_task(coro):
         from streamlit.runtime.scriptrunner.script_run_context import (
             SCRIPT_RUN_CONTEXT_ATTR_NAME,
         )
-        import threading
 
         current_ctx = get_script_run_ctx()
         context_available = True
@@ -584,7 +583,7 @@ def cleanup_temp_file(input_source: str, input_type: str):
     if input_type == "file" and input_source and os.path.exists(input_source):
         try:
             os.unlink(input_source)
-        except:
+        except Exception:
             pass
 
 

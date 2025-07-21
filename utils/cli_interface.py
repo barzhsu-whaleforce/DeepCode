@@ -168,7 +168,7 @@ class CLIInterface:
                     # macOS specific settings
                     try:
                         root.call("wm", "attributes", ".", "-topmost", True)
-                    except:
+                    except Exception:
                         pass
 
                     # macOS compatible file types
@@ -211,7 +211,7 @@ class CLIInterface:
                     # Clean up
                     try:
                         root.destroy()
-                    except:
+                    except Exception:
                         pass
 
                 return file_path
@@ -221,7 +221,7 @@ class CLIInterface:
                 try:
                     if "root" in locals():
                         root.destroy()
-                except:
+                except Exception:
                     pass
 
                 # Print error and suggest alternative

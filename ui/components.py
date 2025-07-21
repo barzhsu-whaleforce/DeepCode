@@ -719,7 +719,7 @@ def file_input_component(task_counter: int) -> Optional[str]:
                         # Clean up original file
                         try:
                             os.unlink(original_file_path)
-                        except:
+                        except Exception:
                             pass
                         return None
 
@@ -729,7 +729,7 @@ def file_input_component(task_counter: int) -> Optional[str]:
                     # Clean up original file
                     try:
                         os.unlink(original_file_path)
-                    except:
+                    except Exception:
                         pass
 
                     # Display conversion result
@@ -751,7 +751,7 @@ def file_input_component(task_counter: int) -> Optional[str]:
                     # Clean up original file
                     try:
                         os.unlink(original_file_path)
-                    except:
+                    except Exception:
                         pass
                     return None
 
@@ -982,7 +982,7 @@ def results_display_component(result: Dict[str, Any], task_counter: int):
                         height=300,
                         key=f"analysis_{task_counter}",
                     )
-            except:
+            except Exception:
                 st.text_area(
                     "Analysis Output",
                     analysis_result,
@@ -1296,9 +1296,6 @@ def enhanced_progress_display_component(
                 ),  # Jump directly to implementation
             ]
 
-        # Create step indicator container
-        step_container = st.container()
-
         # Display step grid with fixed layout
         # Use a maximum of 8 columns for consistent sizing
         max_cols = 8
@@ -1349,9 +1346,6 @@ def enhanced_progress_display_component(
 
         # Status text display
         status_text = st.empty()
-
-        # Real-time information display
-        info_text = st.empty()
 
         # Display mode information
         if not enable_indexing:

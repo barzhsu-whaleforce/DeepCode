@@ -363,7 +363,6 @@ Requirements:
         start_time = time.time()
         max_time = 2400  # 40 minutes
 
-
         # Initialize specialized agents
         code_agent = CodeImplementationAgent(
             self.mcp_agent, self.logger, self.enable_read_tools
@@ -386,7 +385,6 @@ Requirements:
 
         # Initialize memory agent with iteration 0
         memory_agent.start_new_round(iteration=0)
-
 
         while iteration < max_iterations:
             iteration += 1
@@ -452,8 +450,6 @@ Requirements:
                 if memory_agent.should_trigger_memory_optimization(
                     messages, code_agent.get_files_implemented_count()
                 ):
-
-
                     # Memory optimization triggered
 
                     # Apply concise memory optimization
@@ -462,9 +458,6 @@ Requirements:
                     messages = memory_agent.apply_memory_optimization(
                         current_system_message, messages, files_implemented_count
                     )
-         
-
-   
 
                     # Memory optimization completed
 
@@ -480,21 +473,6 @@ Requirements:
                 self.logger.warning(
                     "Analysis loop detected and corrective guidance provided"
                 )
-
-            # Round completed
-
-            # # Test summary functionality after every 10 iterations (reduced frequency)
-            # if iteration % 10 == 0 and code_agent.get_files_implemented_count() > 0:
-            #     self.logger.info(f"🧪 Testing summary functionality at iteration {iteration}")
-            #     optimization_success = await code_agent.test_summary_optimization()
-            #     if optimization_success:
-            #         self.logger.info("✅ Summary optimization working correctly")
-            #     else:
-            #         self.logger.warning("⚠️ Summary optimization may not be working")
-
-            # Update memory agent state with current file implementations
-            files_implemented = code_agent.get_files_implemented_count()
-            # memory_agent.sync_with_code_agent(files_implemented)
 
             # Record file implementations in memory agent (for the current round)
             for file_info in code_agent.get_implementation_summary()["completed_files"]:
@@ -564,7 +542,7 @@ Requirements:
             if self.mcp_agent:
                 try:
                     await self.mcp_agent.__aexit__(None, None, None)
-                except:
+                except Exception:
                     pass
                 self.mcp_agent = None
             raise
