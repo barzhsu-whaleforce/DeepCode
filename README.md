@@ -403,7 +403,7 @@ Implementation Generation • Testing • Documentation
 
 ```bash
 # 🔽 Clone the repository
-git clone https://github.com/HKUDS/deepcode-agent.git
+git clone https://github.com/HKUDS/DeepCode.git
 cd DeepCode/
 
 # 📦 Install UV package manager
@@ -427,7 +427,7 @@ uv pip install -r requirements.txt
 
 ```bash
 # 🔽 Clone the repository
-git clone https://github.com/HKUDS/deepcode-agent.git
+git clone https://github.com/HKUDS/DeepCode.git
 cd DeepCode/
 
 # 📦 Install dependencies
