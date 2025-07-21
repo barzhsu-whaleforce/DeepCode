@@ -3,7 +3,7 @@
 <table style="border: none; margin: 0 auto; padding: 0; border-collapse: collapse;">
 <tr>
 <td align="center" style="vertical-align: middle; padding: 10px; border: none; width: 250px;">
-  <img src="logo.png" alt="DeepCode Logo" width="200" style="margin: 0; padding: 0; display: block;"/>
+  <img src="assets/logo.png" alt="DeepCode Logo" width="200" style="margin: 0; padding: 0; display: block;"/>
 </td>
 <td align="left" style="vertical-align: middle; padding: 10px 0 10px 30px; border: none;">
   <pre style="font-family: 'Courier New', monospace; font-size: 16px; color: #0EA5E9; margin: 0; padding: 0; text-shadow: 0 0 10px #0EA5E9, 0 0 20px rgba(14,165,233,0.5); line-height: 1.2; transform: skew(-1deg, 0deg); display: block;">    ██████╗ ███████╗███████╗██████╗  ██████╗ ██████╗ ██████╗ ███████╗
@@ -16,19 +16,37 @@
 </tr>
 </table>
 
-<img src="https://readme-typing-svg.herokuapp.com?font=Russo+One&size=28&duration=2000&pause=800&color=06B6D4&background=00000000&center=true&vCenter=true&width=800&height=50&lines=%E2%9A%A1+OPEN+AGENTIC+CODING+%E2%9A%A1" alt="DeepCode Tech Subtitle" style="margin-top: 5px; filter: drop-shadow(0 0 12px #06B6D4) drop-shadow(0 0 24px rgba(6,182,212,0.4));"/>
+<!-- <img src="https://readme-typing-svg.herokuapp.com?font=Russo+One&size=28&duration=2000&pause=800&color=06B6D4&background=00000000&center=true&vCenter=true&width=800&height=50&lines=%E2%9A%A1+OPEN+AGENTIC+CODING+%E2%9A%A1" alt="DeepCode Tech Subtitle" style="margin-top: 5px; filter: drop-shadow(0 0 12px #06B6D4) drop-shadow(0 0 24px rgba(6,182,212,0.4));"/> -->
 
 # <img src="https://github.com/Zongwei9888/Experiment_Images/raw/43c585dca3d21b8e4b6390d835cdd34dc4b4b23d/DeepCode_images/title_logo.svg" alt="DeepCode Logo" width="32" height="32" style="vertical-align: middle; margin-right: 8px;"/> DeepCode: Open Agentic Coding
 
 ### *Advancing Code Generation with Multi-Agent Systems*
 
-<p align="center">
+<!-- <p align="center">
   <img src="https://img.shields.io/badge/Version-1.0.0-00d4ff?style=for-the-badge&logo=rocket&logoColor=white" alt="Version">
 
   <img src="https://img.shields.io/badge/License-MIT-4ecdc4?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="License">
   <img src="https://img.shields.io/badge/AI-Multi--Agent-9b59b6?style=for-the-badge&logo=brain&logoColor=white" alt="AI">
   <img src="https://img.shields.io/badge/HKU-Data_Intelligence_Lab-f39c12?style=for-the-badge&logo=university&logoColor=white" alt="HKU">
+</p> -->
+<p>
+  <a href="https://github.com/HKUDS/DeepCode/stargazers"><img src='https://img.shields.io/github/stars/HKUDS/DeepCode?color=00d9ff&style=for-the-badge&logo=star&logoColor=white&labelColor=1a1a2e' /></a>
+  <img src="https://img.shields.io/badge/🐍Python-3.13-4ecdc4?style=for-the-badge&logo=python&logoColor=white&labelColor=1a1a2e">
+  <a href="https://pypi.org/project/deepcode/"><img src="https://img.shields.io/pypi/v/deepcode.svg?style=for-the-badge&logo=pypi&logoColor=white&labelColor=1a1a2e&color=ff6b6b"></a>
 </p>
+<p>
+  <a href="https://discord.gg/yF2MmDJyGJ"><img src="https://img.shields.io/badge/💬Discord-Community-7289da?style=for-the-badge&logo=discord&logoColor=white&labelColor=1a1a2e"></a>
+  <a href="https://github.com/HKUDS/DeepCode/issues/11"><img src="https://img.shields.io/badge/💬WeChat-Group-07c160?style=for-the-badge&logo=wechat&logoColor=white&labelColor=1a1a2e"></a>
+</p>
+<div align="center">
+  <div style="width: 100%; height: 2px; margin: 20px 0; background: linear-gradient(90deg, transparent, #00d9ff, transparent);"></div>
+</div>
+
+<div align="center">
+  <a href="#-quick-start" style="text-decoration: none;">
+    <img src="https://img.shields.io/badge/Quick%20Start-Get%20Started%20Now-00d9ff?style=for-the-badge&logo=rocket&logoColor=white&labelColor=1a1a2e">
+  </a>
+</div>
 
 ### 🖥️ **Interface Showcase**
 
@@ -389,7 +407,31 @@ Implementation Generation • Testing • Documentation
 
 ### 📦 **Step 1: Installation**
 
-#### 🔥 **Using UV (Recommended)**
+#### ⚡ **Direct Installation (Recommended)**
+
+```bash
+# 🚀 Install DeepCode package directly
+pip install deepcode
+
+# 🔑 Download configuration files
+curl -O https://raw.githubusercontent.com/HKUDS/DeepCode/main/mcp_agent.config.yaml
+curl -O https://raw.githubusercontent.com/HKUDS/DeepCode/main/mcp_agent.secrets.yaml
+
+# 🔑 Configure API keys (required)
+# Edit mcp_agent.secrets.yaml with your API keys and base_url:
+# - openai: api_key, base_url (for OpenAI/custom endpoints)
+# - anthropic: api_key (for Claude models)
+
+# 🔑 Configure BRAVE_API_KEY for web search (optional)
+# Edit mcp_agent.config.yaml and update BRAVE_API_KEY under brave.env section
+```
+
+#### 🔧 **Development Installation (From Source)**
+
+<details>
+<summary><strong>📂 Click to expand development installation options</strong></summary>
+
+##### 🔥 **Using UV (Recommended for Development)**
 
 ```bash
 # 🔽 Clone the repository
@@ -413,7 +455,7 @@ uv pip install -r requirements.txt
 # Edit mcp_agent.config.yaml and update BRAVE_API_KEY under brave.env section
 ```
 
-#### 🐍 **Using Traditional pip**
+##### 🐍 **Using Traditional pip**
 
 ```bash
 # 🔽 Clone the repository
@@ -432,12 +474,24 @@ pip install -r requirements.txt
 # Edit mcp_agent.config.yaml and update BRAVE_API_KEY under brave.env section
 ```
 
+</details>
+
 ### ⚡ **Step 2: Launch Application**
 
+#### 🚀 **Using Installed Package (Recommended)**
+
+```bash
+# 🌐 Launch web interface directly
+deepcode
+
+# The application will automatically start at http://localhost:8501
+```
+
+#### 🛠️ **Using Source Code**
 
 Choose your preferred interface:
 
-#### 🌐 **Web Interface** (Recommended)
+##### 🌐 **Web Interface** (Recommended)
 ```bash
 # Using UV
 uv run streamlit run ui/streamlit_app.py
@@ -448,7 +502,7 @@ streamlit run ui/streamlit_app.py
   <img src="https://img.shields.io/badge/Access-localhost:8501-00d4ff?style=flat-square&logo=streamlit&logoColor=white" alt="Web Access" />
 </div>
 
-#### 🖥️ **CLI Interface** (Advanced Users)
+##### 🖥️ **CLI Interface** (Advanced Users)
 ```bash
 # Using UV
 uv run python cli/main_cli.py
