@@ -31,35 +31,35 @@ mcp:
       # Use `npm i -g @modelcontextprotocol/server-filesystem` to install the server globally.
       # Use `npm -g root` to find the global node_modules path.`
       # command: "node"
-      # args: ["c:/Program Files/nodejs/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js","./deepcode_lab"]
+      # args: ["c:/Program Files/nodejs/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js","."]
       command: "npx"
       args: ["-y", "@modelcontextprotocol/server-filesystem"]
     fetch:
       command: "uvx"
       args: ["mcp-server-fetch"]
     github-downloader:
-      command: "python3"
+      command: "python"
       args: ["tools/git_command.py"]
       env:
         PYTHONPATH: "."
     file-downloader:
-      command: "python3"
+      command: "python"
       args: ["tools/pdf_downloader.py"]
       env:
         PYTHONPATH: "."
     command-executor:
-      command: "python3"
+      command: "python"
       args: ["tools/command_executor.py"]
       env:
         PYTHONPATH: "."
     code-implementation:
-      command: "python3"
+      command: "python"
       args: ["tools/code_implementation_server.py"]
       env:
         PYTHONPATH: "."
       description: "Paper code reproduction tool server - provides file operations, code execution, search and other functions"
     code-reference-indexer:
-      command: "python3"
+      command: "python"
       args: ["tools/code_reference_indexer.py"]
       env:
         PYTHONPATH: "."

@@ -476,6 +476,34 @@ pip install -r requirements.txt
 
 </details>
 
+#### 🪟 **Windows Users: Additional MCP Server Configuration**
+
+If you're using Windows, you may need to configure MCP servers manually in `mcp_agent.config.yaml`:
+
+```bash
+# 1. Install MCP servers globally
+npm i -g @modelcontextprotocol/server-brave-search
+npm i -g @modelcontextprotocol/server-filesystem
+
+# 2. Find your global node_modules path
+npm -g root
+```
+
+Then update your `mcp_agent.config.yaml` to use absolute paths:
+
+```yaml
+mcp:
+  servers:
+    brave:
+      command: "node"
+      args: ["C:/Program Files/nodejs/node_modules/@modelcontextprotocol/server-brave-search/dist/index.js"]
+    filesystem:
+      command: "node" 
+      args: ["C:/Program Files/nodejs/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js", "."]
+```
+
+> **Note**: Replace the path with your actual global node_modules path from step 2.
+
 ### ⚡ **Step 2: Launch Application**
 
 #### 🚀 **Using Installed Package (Recommended)**
