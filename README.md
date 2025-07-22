@@ -498,7 +498,7 @@ mcp:
       command: "node"
       args: ["C:/Program Files/nodejs/node_modules/@modelcontextprotocol/server-brave-search/dist/index.js"]
     filesystem:
-      command: "node" 
+      command: "node"
       args: ["C:/Program Files/nodejs/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js", "."]
 ```
 
