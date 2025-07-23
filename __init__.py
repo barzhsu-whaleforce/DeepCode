@@ -5,7 +5,7 @@ DeepCode - AI Research Engine
 ⚡ Transform research papers into working code automatically
 """
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __author__ = "DeepCode Team"
 __url__ = "https://github.com/HKUDS/DeepCode"
 
@@ -18,5 +18,4 @@ __all__ = [
     "__version__",
     "__author__",
     "__url__",
-    "__description__",
 ]

@@ -13,7 +13,7 @@ def read_long_description():
 
 # Retrieving metadata from __init__.py
 def retrieve_metadata():
-    vars2find = ["__author__", "__version__", "__url__", "__description__"]
+    vars2find = ["__author__", "__version__", "__url__"]
     vars2readme = {}
 
     # Use definitive path relative to setup.py location
