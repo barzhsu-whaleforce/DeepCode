@@ -31,7 +31,7 @@ import json
 import os
 import re
 import yaml
-from typing import Callable, Dict, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
 
 # MCP Agent imports
 from mcp_agent.agents.agent import Agent
@@ -97,6 +97,55 @@ def get_preferred_llm_class(config_path: str = "mcp_agent.secrets.yaml"):
         print(f"🤖 Error reading config file {config_path}: {e}")
         print("🤖 Falling back to OpenAIAugmentedLLM")
         return OpenAIAugmentedLLM
+
+
+def get_default_search_server(config_path: str = "mcp_agent.config.yaml"):
+    """
+    Get the default search server from configuration.
+
+    Args:
+        config_path: Path to the main configuration file
+
+    Returns:
+        str: The default search server name ("brave" or "bocha-mcp")
+    """
+    try:
+        if os.path.exists(config_path):
+            with open(config_path, "r", encoding="utf-8") as f:
+                config = yaml.safe_load(f)
+            
+            default_server = config.get("default_search_server", "brave")
+            print(f"🔍 Using search server: {default_server}")
+            return default_server
+        else:
+            print(f"⚠️ Config file {config_path} not found, using default: brave")
+            return "brave"
+    except Exception as e:
+        print(f"⚠️ Error reading config file {config_path}: {e}")
+        print("🔍 Falling back to default search server: brave")
+        return "brave"
+
+
+def get_search_server_names(additional_servers: Optional[List[str]] = None) -> List[str]:
+    """
+    Get server names list with the configured default search server.
+
+    Args:
+        additional_servers: Optional list of additional servers to include
+
+    Returns:
+        List[str]: List of server names including the default search server
+    """
+    default_search = get_default_search_server()
+    server_names = [default_search]
+    
+    if additional_servers:
+        # Add additional servers, avoiding duplicates
+        for server in additional_servers:
+            if server not in server_names:
+                server_names.append(server)
+    
+    return server_names
 
 
 def extract_clean_json(llm_output: str) -> str:
@@ -193,7 +242,7 @@ async def run_research_analyzer(prompt_text: str, logger) -> str:
         analyzer_agent = Agent(
             name="ResearchAnalyzerAgent",
             instruction=PAPER_INPUT_ANALYZER_PROMPT,
-            server_names=["brave"],
+            server_names=get_search_server_names(),
         )
 
         async with analyzer_agent:
@@ -341,12 +390,12 @@ async def run_code_analyzer(paper_dir: str, logger) -> str:
     algorithm_analysis_agent = Agent(
         name="AlgorithmAnalysisAgent",
         instruction=PAPER_ALGORITHM_ANALYSIS_PROMPT,
-        server_names=["filesystem", "brave"],
+        server_names=get_search_server_names(additional_servers=["filesystem"]),
     )
     code_planner_agent = Agent(
         name="CodePlannerAgent",
         instruction=CODE_PLANNING_PROMPT,
-        server_names=["brave"],
+        server_names=get_search_server_names(),
     )
 
     code_aggregator_agent = ParallelLLM(
@@ -437,7 +486,7 @@ Please locate and analyze the markdown (.md) file containing the research paper.
 Focus on:
 1. **References section analysis** - Extract all citations from the References/Bibliography part
 2. References with high-quality GitHub implementations
-3. Papers cited for methodology, algorithms, or core techniques
+3. Papers cited for methodology, algorithms, or core techniques  
 4. Related work that shares similar technical approaches
 5. Implementation references that could provide code patterns
 
@@ -579,7 +628,9 @@ async def orchestrate_reference_intelligence_agent(
             return f.read()
 
     # Execute reference analysis
-    reference_result = await paper_reference_analyzer(dir_info["paper_dir"], logger)
+    reference_result = await paper_reference_analyzer(
+        dir_info["paper_dir"], logger
+    )
 
     # Save reference analysis result
     with open(reference_path, "w", encoding="utf-8") as f:
@@ -931,9 +982,7 @@ async def run_chat_planning_agent(user_input: str, logger) -> str:
         chat_planning_agent = Agent(
             name="ChatPlanningAgent",
             instruction=CHAT_AGENT_PLANNING_PROMPT,
-            server_names=[
-                "brave"
-            ],  # Add tools if needed for web search or other capabilities
+            server_names=get_search_server_names(),  # Dynamic search server configuration
         )
 
         async with chat_planning_agent:

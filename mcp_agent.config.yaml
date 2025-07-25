@@ -1,5 +1,8 @@
 $schema: ./schema/mcp-agent.config.schema.json
 
+# Default search server configuration
+# Options: "brave" or "bocha-mcp"
+default_search_server: "brave"
 
 execution_engine: asyncio
 logger:
@@ -64,6 +67,12 @@ mcp:
       env:
         PYTHONPATH: "."
       description: "Code reference indexer server - Provides intelligent code reference search from indexed repositories"
+    bocha-mcp:
+      command: "python3"
+      args: ["tools/bocha_search_server.py"]
+      env:
+        PYTHONPATH: "."
+        BOCHA_API_KEY: ""
 
 openai:
   # Secrets (API keys, etc.) are stored in an mcp_agent.secrets.yaml file which can be gitignored
