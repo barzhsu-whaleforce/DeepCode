@@ -113,7 +113,7 @@ def get_default_search_server(config_path: str = "mcp_agent.config.yaml"):
         if os.path.exists(config_path):
             with open(config_path, "r", encoding="utf-8") as f:
                 config = yaml.safe_load(f)
-            
+
             default_server = config.get("default_search_server", "brave")
             print(f"🔍 Using search server: {default_server}")
             return default_server
@@ -126,7 +126,9 @@ def get_default_search_server(config_path: str = "mcp_agent.config.yaml"):
         return "brave"
 
 
-def get_search_server_names(additional_servers: Optional[List[str]] = None) -> List[str]:
+def get_search_server_names(
+    additional_servers: Optional[List[str]] = None,
+) -> List[str]:
     """
     Get server names list with the configured default search server.
 
@@ -138,13 +140,13 @@ def get_search_server_names(additional_servers: Optional[List[str]] = None) -> L
     """
     default_search = get_default_search_server()
     server_names = [default_search]
-    
+
     if additional_servers:
         # Add additional servers, avoiding duplicates
         for server in additional_servers:
             if server not in server_names:
                 server_names.append(server)
-    
+
     return server_names
 
 
@@ -486,7 +488,7 @@ Please locate and analyze the markdown (.md) file containing the research paper.
 Focus on:
 1. **References section analysis** - Extract all citations from the References/Bibliography part
 2. References with high-quality GitHub implementations
-3. Papers cited for methodology, algorithms, or core techniques  
+3. Papers cited for methodology, algorithms, or core techniques
 4. Related work that shares similar technical approaches
 5. Implementation references that could provide code patterns
 
@@ -628,9 +630,7 @@ async def orchestrate_reference_intelligence_agent(
             return f.read()
 
     # Execute reference analysis
-    reference_result = await paper_reference_analyzer(
-        dir_info["paper_dir"], logger
-    )
+    reference_result = await paper_reference_analyzer(dir_info["paper_dir"], logger)
 
     # Save reference analysis result
     with open(reference_path, "w", encoding="utf-8") as f:

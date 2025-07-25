@@ -1,4 +1,3 @@
-import asyncio
 import os
 import sys
 import json
@@ -15,13 +14,13 @@ server = FastMCP(
     "bocha-search-mcp",
     prompt="""
 # Bocha Search MCP Server
-                 
+
 Bocha is a Chinese search engine for AI, This server provides tools for searching the web using Bocha Search API.
 It allows you to get enhanced search details from billions of web documents, including weather, news, wikis, healthcare, train tickets, images, and more.
 
 ## Available Tools
-                 
-### 1. bocha_web_search 
+
+### 1. bocha_web_search
 Search with Bocha Web Search and get enhanced search details from billions of web documents, including page titles, urls, summaries, site names, site icons, publication dates, image links, and more.
 
 ### 2. bocha_ai_search
@@ -36,7 +35,7 @@ result item, including:
 - Bocha AI search: Title, URL, Description, Published date, Site name, and structured data card
 
 If the API key is missing or invalid, appropriate error messages will be returned.
-"""
+""",
 )
 
 
@@ -69,7 +68,7 @@ async def bocha_web_search(
             "query": query,
             "summary": True,
             "freshness": freshness,
-            "count": count
+            "count": count,
         }
 
         headers = {
@@ -86,7 +85,7 @@ async def bocha_web_search(
             resp = response.json()
             if "data" not in resp:
                 return "Search error."
-            
+
             data = resp["data"]
 
             if "webPages" not in data:
@@ -142,7 +141,7 @@ async def bocha_ai_search(
             "freshness": freshness,
             "count": count,
             "answer": False,
-            "stream": False
+            "stream": False,
         }
 
         headers = {
@@ -163,9 +162,9 @@ async def bocha_ai_search(
                     content = {}
                     try:
                         content = json.loads(message["content"])
-                    except:
+                    except (json.JSONDecodeError, TypeError):
                         content = {}
-                        
+
                     # 网页
                     if message["content_type"] == "webpage":
                         if "value" in content:
@@ -177,12 +176,15 @@ async def bocha_ai_search(
                                     f"Published date: {item['datePublished']}\n"
                                     f"Site name: {item['siteName']}"
                                 )
-                    elif message["content_type"] != "image" and message["content"] != "{}":
+                    elif (
+                        message["content_type"] != "image"
+                        and message["content"] != "{}"
+                    ):
                         results.append(message["content"])
 
             if not results:
                 return "No results found."
-            
+
             return "\n\n".join(results)
 
     except httpx.HTTPStatusError as e:
@@ -203,8 +205,7 @@ def main():
             file=sys.stderr,
         )
         print(
-            "Get a Bocha API key from: "
-            "https://open.bochaai.com",
+            "Get a Bocha API key from: " "https://open.bochaai.com",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -215,4 +216,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main() 
+    main()
