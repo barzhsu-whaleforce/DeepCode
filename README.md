@@ -547,11 +547,11 @@ default_search_server: "brave"
 ```
 
 **Available Options:**
-- **🔍 Brave Search** (`"brave"`): 
+- **🔍 Brave Search** (`"brave"`):
   - Default option with high-quality search results
   - Requires BRAVE_API_KEY configuration
   - Recommended for most users
-  
+
 - **🌐 Bocha-MCP** (`"bocha-mcp"`):
   - Alternative search server option
   - Requires BOCHA_API_KEY configuration
