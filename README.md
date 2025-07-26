@@ -448,8 +448,10 @@ curl -O https://raw.githubusercontent.com/HKUDS/DeepCode/main/mcp_agent.secrets.
 # - openai: api_key, base_url (for OpenAI/custom endpoints)
 # - anthropic: api_key (for Claude models)
 
-# 🔑 Configure BRAVE_API_KEY for web search (optional)
-# Edit mcp_agent.config.yaml and update BRAVE_API_KEY under brave.env section
+# 🔑 Configure search API keys for web search (optional)
+# Edit mcp_agent.config.yaml to set your API keys:
+# - For Brave Search: Set BRAVE_API_KEY: "your_key_here" in brave.env section (line ~28)
+# - For Bocha-MCP: Set BOCHA_API_KEY: "your_key_here" in bocha-mcp.env section (line ~74)
 ```
 
 #### 🔧 **Development Installation (From Source)**
@@ -477,8 +479,10 @@ uv pip install -r requirements.txt
 # - openai: api_key, base_url (for OpenAI/custom endpoints)
 # - anthropic: api_key (for Claude models)
 
-# 🔑 Configure BRAVE_API_KEY for web search (optional)
-# Edit mcp_agent.config.yaml and update BRAVE_API_KEY under brave.env section
+# 🔑 Configure search API keys for web search (optional)
+# Edit mcp_agent.config.yaml to set your API keys:
+# - For Brave Search: Set BRAVE_API_KEY: "your_key_here" in brave.env section (line ~28)
+# - For Bocha-MCP: Set BOCHA_API_KEY: "your_key_here" in bocha-mcp.env section (line ~74)
 ```
 
 ##### 🐍 **Using Traditional pip**
@@ -496,8 +500,10 @@ pip install -r requirements.txt
 # - openai: api_key, base_url (for OpenAI/custom endpoints)
 # - anthropic: api_key (for Claude models)
 
-# 🔑 Configure BRAVE_API_KEY for web search (optional)
-# Edit mcp_agent.config.yaml and update BRAVE_API_KEY under brave.env section
+# 🔑 Configure search API keys for web search (optional)
+# Edit mcp_agent.config.yaml to set your API keys:
+# - For Brave Search: Set BRAVE_API_KEY: "your_key_here" in brave.env section (line ~28)
+# - For Bocha-MCP: Set BOCHA_API_KEY: "your_key_here" in bocha-mcp.env section (line ~74)
 ```
 
 </details>
@@ -541,17 +547,35 @@ default_search_server: "brave"
 ```
 
 **Available Options:**
-- **🔍 Brave Search** (`"brave"`):
+- **🔍 Brave Search** (`"brave"`): 
   - Default option with high-quality search results
   - Requires BRAVE_API_KEY configuration
   - Recommended for most users
-
+  
 - **🌐 Bocha-MCP** (`"bocha-mcp"`):
-  - Alternative search server
-  - No additional API key required
-  - Good fallback option
+  - Alternative search server option
+  - Requires BOCHA_API_KEY configuration
+  - Uses local Python server implementation
 
-> **💡 Tip**: If you don't have a Brave API key, you can switch to `"bocha-mcp"` for search functionality without additional configuration.
+**API Key Configuration in mcp_agent.config.yaml:**
+```yaml
+# For Brave Search (default) - around line 28
+brave:
+  command: "npx"
+  args: ["-y", "@modelcontextprotocol/server-brave-search"]
+  env:
+    BRAVE_API_KEY: "your_brave_api_key_here"
+
+# For Bocha-MCP (alternative) - around line 74
+bocha-mcp:
+  command: "python"
+  args: ["tools/bocha_search_server.py"]
+  env:
+    PYTHONPATH: "."
+    BOCHA_API_KEY: "your_bocha_api_key_here"
+```
+
+> **💡 Tip**: Both search servers require API key configuration. Choose the one that best fits your API access and requirements.
 
 ### ⚡ **Step 2: Launch Application**
 
