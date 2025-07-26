@@ -91,6 +91,32 @@
 </tr>
 </table>
 
+---
+
+<div align="center">
+
+### 🎬 **Introduction Video**
+
+<div style="margin: 20px 0;">
+  <a href="https://youtu.be/PRgmP8pOI08" target="_blank">
+    <img src="https://img.youtube.com/vi/PRgmP8pOI08/maxresdefault.jpg" 
+         alt="DeepCode Introduction Video" 
+         width="75%" 
+         style="border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); transition: transform 0.3s ease;"/>
+  </a>
+</div>
+
+*🎯 **Watch our complete introduction** - See how DeepCode transforms research papers and natural language into production-ready code*
+
+<p>
+  <a href="https://youtu.be/PRgmP8pOI08" target="_blank">
+    <img src="https://img.shields.io/badge/▶️_Watch_Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch Video"/>
+  </a>
+</p>
+
+</div>
+
+---
 
 
 
@@ -503,6 +529,29 @@ mcp:
 ```
 
 > **Note**: Replace the path with your actual global node_modules path from step 2.
+
+#### 🔍 **Search Server Configuration (Optional)**
+
+DeepCode supports multiple search servers for web search functionality. You can configure your preferred option in `mcp_agent.config.yaml`:
+
+```yaml
+# Default search server configuration
+# Options: "brave" or "bocha-mcp"
+default_search_server: "brave"
+```
+
+**Available Options:**
+- **🔍 Brave Search** (`"brave"`): 
+  - Default option with high-quality search results
+  - Requires BRAVE_API_KEY configuration
+  - Recommended for most users
+  
+- **🌐 Bocha-MCP** (`"bocha-mcp"`):
+  - Alternative search server
+  - No additional API key required
+  - Good fallback option
+
+> **💡 Tip**: If you don't have a Brave API key, you can switch to `"bocha-mcp"` for search functionality without additional configuration.
 
 ### ⚡ **Step 2: Launch Application**
 
