@@ -579,69 +579,69 @@ complete_reproduction_plan:
   paper_info:
     title: "[Full paper title]"
     core_contribution: "[Main innovation being reproduced]"
-    
+
   # SECTION 1: File Structure Design
-  
+
   # DESIGN YOUR OWN STRUCTURE: Create a file organization that best serves this specific paper
-  # - Analyze what the paper contains (algorithms, models, experiments, systems, etc.)  
+  # - Analyze what the paper contains (algorithms, models, experiments, systems, etc.)
   # - Organize files and directories in the most logical way for implementation
   # - Create meaningful names and groupings based on paper content
   # - Keep it clean, intuitive, and focused on what actually needs to be implemented
-  
+
   file_structure: |
     [Design and specify your own project structure here]
     [Organize based on what this paper actually contains and needs]
     [Create directories and files that make sense for this specific implementation]
     [No templates - create what works best for this paper]
-  
+
   # SECTION 2: Implementation Components
-  
+
   # IDENTIFY AND SPECIFY: What needs to be implemented based on this paper
   # - List all algorithms, models, systems, or components mentioned
   # - Map each to implementation details and file locations
   # - Include formulas, pseudocode, and technical specifications
   # - Organize in whatever way makes sense for this paper
-  
+
   implementation_components: |
     [List and specify all components that need implementation]
     [For each component: purpose, location, algorithms, formulas, technical details]
     [Organize and structure this based on the paper's actual content]
-      
+
   # SECTION 3: Validation & Evaluation
-  
-  # DESIGN VALIDATION: How to verify the implementation works correctly  
+
+  # DESIGN VALIDATION: How to verify the implementation works correctly
   # - Define what experiments, tests, or proofs are needed
   # - Specify expected results from the paper (figures, tables, theorems)
   # - Design validation approach appropriate for this paper's domain
   # - Include setup requirements and success criteria
-  
+
   validation_approach: |
     [Design validation strategy appropriate for this paper]
     [Specify experiments, tests, or mathematical verification needed]
     [Define expected results and success criteria]
     [Include any special setup or evaluation requirements]
-                 
+
   # SECTION 4: Environment & Dependencies
-  
+
   # SPECIFY REQUIREMENTS: What's needed to run this implementation
   # - Programming language and version requirements
   # - External libraries and exact versions (if specified in paper)
   # - Hardware requirements (GPU, memory, etc.)
   # - Any special setup or installation steps
-  
+
   environment_setup: |
     [List all dependencies and environment requirements for this specific paper]
     [Include versions where specified, reasonable defaults where not]
     [Note any special hardware or software requirements]
-      
+
   # SECTION 5: Implementation Strategy
-  
+
   # PLAN YOUR APPROACH: How to implement this paper step by step
   # - Break down implementation into logical phases
-  # - Identify dependencies between components  
+  # - Identify dependencies between components
   # - Plan verification and testing at each stage
   # - Handle missing details with reasonable defaults
-  
+
   implementation_strategy: |
     [Design your implementation approach for this specific paper]
     [Break into phases that make sense for this paper's components]
