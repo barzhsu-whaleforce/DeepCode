@@ -544,85 +544,32 @@ Combine EVERYTHING from both analyses:
 - Every hyperparameter with its value
 - Every experiment with expected results
 
-## 2. CREATE DETAILED FILE MAPPING
+## 2. MAP CONTENT TO IMPLEMENTATION
 
-For EACH file in the structure, specify EXACTLY what it implements:
+For each component you identify, specify how it will be implemented:
 
-```yaml
-detailed_file_specifications:
-  src/core/[algorithm_name].py:
-    implements: "[Exact algorithm name from paper]"
-    algorithm_reference: "[Section X.Y, Algorithm Z]"
-
-    classes:
-      - name: "[ClassName]"
-        purpose: "[What this class does]"
-        key_methods:
-          - method: "__init__"
-            parameters: "[list all parameters with types]"
-            initializes: "[what gets initialized]"
-
-          - method: "[method_name]"
-            implements: "[Which equation/algorithm step]"
-            formula: "[Exact formula from paper]"
-            inputs: "[parameter: type, ...]"
-            outputs: "[return type and meaning]"
-
-    functions:
-      - name: "[function_name]"
-        implements: "[Equation X from Section Y]"
-        pseudocode: |
-          [EXACT pseudocode from paper]
-
-    dependencies:
-      imports_from: "[other project files]"
-      external: "[numpy, torch, etc.]"
+```
+# DESIGN YOUR MAPPING: Connect paper content to code organization
+[For each algorithm/component/method in the paper]:
+  - What it does and where it's described in the paper
+  - How you'll organize the code (files, classes, functions - your choice)
+  - What specific formulas, algorithms, or procedures need implementation
+  - Dependencies and relationships with other components
+  - Implementation approach that makes sense for this specific paper
 ```
 
-## 3. ALGORITHM-TO-FILE MAPPING
+## 3. EXTRACT ALL TECHNICAL DETAILS
 
-Map EVERY algorithm/formula to its implementation location:
+Identify every technical detail that needs implementation:
 
-```yaml
-algorithm_implementation_map:
-  "StateMask Explanation (Algorithm 1)":
-    primary_file: "src/models/mask_network.py"
-    supporting_files:
-      - "src/utils/mask_utils.py"
-    key_functions:
-      - "compute_importance_scores: Implements Eq. 3-5"
-      - "optimize_mask: Implements Algorithm 1 steps 3-7"
-
-  "Mixed Distribution Construction (Section 3.2)":
-    primary_file: "src/core/mixed_distribution.py"
-    formulas_implemented:
-      - "Eq. 7: State mixing probability"
-      - "Eq. 8: Distribution sampling"
 ```
-
-## 4. COMPLETE HYPERPARAMETER SPECIFICATION
-
-Create exhaustive configuration with sources:
-
-```yaml
-complete_configuration:
-  # From Section 4.1
-  model_architecture:
-    mask_network:
-      layers: [400, 300]  # "two hidden layers of 400 and 300 units"
-      activation: "relu"
-      initialization: "xavier_uniform"
-
-  # From Table 1
-  training_hyperparameters:
-    learning_rate: 3e-4
-    batch_size: 64
-    buffer_size: 1e6
-
-  # From Section 3.3
-  algorithm_parameters:
-    reset_probability: 0.3  # "p = 0.3 in all experiments"
-    exploration_weight: 0.1  # "λ = 0.1 for RND bonus"
+# COMPREHENSIVE TECHNICAL EXTRACTION:
+[Gather all implementation-relevant details from the paper]:
+  - All algorithms with complete pseudocode and mathematical formulations
+  - All parameters, hyperparameters, and configuration values
+  - All architectural details (if applicable to your paper type)
+  - All experimental procedures and evaluation methods
+  - Any implementation hints, tricks, or special considerations mentioned
 ```
 
 # COMPREHENSIVE OUTPUT FORMAT
@@ -632,107 +579,74 @@ complete_reproduction_plan:
   paper_info:
     title: "[Full paper title]"
     core_contribution: "[Main innovation being reproduced]"
-
-  # SECTION 1: Complete File Structure with Detailed Specifications
-  file_structure:
-    [PROJECT_NAME]/
-    ├── src/
-    │   ├── core/
-    │   │   ├── __init__.py
-    │   │   ├── [main_algorithm].py  # Implements Algorithm 1 from Section 3.1
-    │   │   │   # Classes: [MainClass] - handles [specific responsibility]
-    │   │   │   # Functions: [func1] - computes Equation 3
-    │   │   └── [component].py       # Implements [Component] from Section 3.2
-    │   ├── models/
-    │   │   ├── [network].py         # Architecture from Section 4.1, Table 2
-    │   │   │   # Layers: [detailed architecture]
-    │   │   │   # Forward: implements Equation 5-7
-    │   └── utils/
-    │       └── [helpers].py         # Support functions for [specific purpose]
-    ├── experiments/
-    │   ├── run_[environment].py     # Reproduces Figure 3, Table 1
-    │   └── ablation_[component].py  # Reproduces Section 5.3 ablation
-    └── configs/
-        └── hyperparameters.yaml     # All parameters from paper
-
-  # SECTION 2: Algorithm Implementation Details
-  algorithm_implementations:
-    - algorithm: "[Name from paper]"
-      location: "src/core/[filename].py"
-      pseudocode: |
-        [COMPLETE pseudocode from paper]
-      implementation_notes:
-        - "Line 3: Use torch.softmax with temperature"
-        - "Line 5: Clip gradients at norm 1.0"
-      formulas:
-        - equation: "[LaTeX formula]"
-          code: "[Python implementation]"
-
-  # SECTION 3: Model Architectures
-  model_specifications:
-    - model: "[Model name]"
-      file: "src/models/[model].py"
-      architecture: |
-        Input: [shape and type]
-        Layer 1: [type, size, activation]
-        Layer 2: [type, size, activation]
-        Output: [shape and type]
-      initialization: "[How to initialize]"
-
-  # SECTION 4: Training Procedures
-  training_procedures:
-    main_training_loop:
-      file: "src/training/train.py"
-      steps:
-        1. "[Exact step from paper]"
-        2. "[Next step with details]"
-      loss_functions:
-        - name: "[loss name]"
-          formula: "[exact formula]"
-          implementation: "[Python code]"
-
-  # SECTION 5: Experiments
-  experiments:
-    - name: "[Experiment name from paper]"
-      reproduces: "[Figure/Table X]"
-      script: "experiments/[script].py"
-      expected_results:
-        metric: "[exact value ± tolerance]"
-      setup:
-        - "[Specific setup step]"
-
-  # SECTION 6: Dependencies & Environment
-  environment:
-    python: "[version]"
-    cuda: "[version if needed]"
-    packages:
-      - "[package==exact.version]"
-
-  # SECTION 7: Missing Details & Defaults
-  missing_details_solutions:
-    - missing: "[What wasn't specified]"
-      solution: "[Reasonable default with justification]"
-
-  # SECTION 8: Implementation Order
-  implementation_roadmap:
-    week_1:
-      - "Implement [core algorithm] with unit tests"
-      - "Verify [key formula] matches paper"
-    week_2:
-      - "Build [model architecture]"
-      - "Integrate with [training loop]"
-    week_3:
-      - "Run [main experiment]"
-      - "Compare with [expected results]"
-
-  # SECTION 9: Validation Checklist
-  validation_checklist:
-    algorithm_correctness:
-      - "[ ] Algorithm 1 produces expected intermediate values"
-      - "[ ] Equation 3 computation matches manual calculation"
-    experimental_results:
-      - "[ ] Figure 3 reproduction within 5% of paper"
-      - "[ ] Table 1 metrics match reported values"
+    
+  # SECTION 1: File Structure Design
+  
+  # DESIGN YOUR OWN STRUCTURE: Create a file organization that best serves this specific paper
+  # - Analyze what the paper contains (algorithms, models, experiments, systems, etc.)  
+  # - Organize files and directories in the most logical way for implementation
+  # - Create meaningful names and groupings based on paper content
+  # - Keep it clean, intuitive, and focused on what actually needs to be implemented
+  
+  file_structure: |
+    [Design and specify your own project structure here]
+    [Organize based on what this paper actually contains and needs]
+    [Create directories and files that make sense for this specific implementation]
+    [No templates - create what works best for this paper]
+  
+  # SECTION 2: Implementation Components
+  
+  # IDENTIFY AND SPECIFY: What needs to be implemented based on this paper
+  # - List all algorithms, models, systems, or components mentioned
+  # - Map each to implementation details and file locations
+  # - Include formulas, pseudocode, and technical specifications
+  # - Organize in whatever way makes sense for this paper
+  
+  implementation_components: |
+    [List and specify all components that need implementation]
+    [For each component: purpose, location, algorithms, formulas, technical details]
+    [Organize and structure this based on the paper's actual content]
+      
+  # SECTION 3: Validation & Evaluation
+  
+  # DESIGN VALIDATION: How to verify the implementation works correctly  
+  # - Define what experiments, tests, or proofs are needed
+  # - Specify expected results from the paper (figures, tables, theorems)
+  # - Design validation approach appropriate for this paper's domain
+  # - Include setup requirements and success criteria
+  
+  validation_approach: |
+    [Design validation strategy appropriate for this paper]
+    [Specify experiments, tests, or mathematical verification needed]
+    [Define expected results and success criteria]
+    [Include any special setup or evaluation requirements]
+                 
+  # SECTION 4: Environment & Dependencies
+  
+  # SPECIFY REQUIREMENTS: What's needed to run this implementation
+  # - Programming language and version requirements
+  # - External libraries and exact versions (if specified in paper)
+  # - Hardware requirements (GPU, memory, etc.)
+  # - Any special setup or installation steps
+  
+  environment_setup: |
+    [List all dependencies and environment requirements for this specific paper]
+    [Include versions where specified, reasonable defaults where not]
+    [Note any special hardware or software requirements]
+      
+  # SECTION 5: Implementation Strategy
+  
+  # PLAN YOUR APPROACH: How to implement this paper step by step
+  # - Break down implementation into logical phases
+  # - Identify dependencies between components  
+  # - Plan verification and testing at each stage
+  # - Handle missing details with reasonable defaults
+  
+  implementation_strategy: |
+    [Design your implementation approach for this specific paper]
+    [Break into phases that make sense for this paper's components]
+    [Plan testing and verification throughout the process]
+    [Address any missing details or ambiguities in the paper]
 ```
 
 BE EXHAUSTIVE. Every algorithm, every formula, every parameter, every file should be specified in complete detail."""

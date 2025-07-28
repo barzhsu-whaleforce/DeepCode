@@ -298,21 +298,34 @@ Advanced retrieval-augmented generation combining semantic vector embeddings wit
 
 #### 🛠️ **Implementation Tools Matrix**
 
-| 🛠️ Tool | 🔧 Function | 💡 Purpose |
-|----------|-------------|------------|
-| **📄 read_code_mem** | Read code summary from memory | Efficient code context retrieval |
-| **✍️ write_file** | Write file contents | Code file generation |
-| **🐍 execute_python** | Execute Python code | Code testing and validation |
-| **⚡ execute_bash** | Execute bash commands | Environment setup and package management |
-| **🔗 search_code_reference** | Search GitHub repositories | Automated CodeRAG and repository discovery |
-| **📁 get_file_structure** | Get directory structure | Project organization |
-| **⚙️ set_workspace** | Set working directory | Environment configuration |
-| **📊 get_operation_history** | Track operations | Process monitoring |
-| **🔍 brave** | Web search via Brave API | Real-time information retrieval |
-| **📂 filesystem** | File system operations | File and directory management |
-| **🌐 fetch** | Fetch content from URLs | Web content extraction |
-| **📥 github-downloader** | Download GitHub repositories | Repository content acquisition |
-| **📋 file-downloader** | Download files and PDFs | Document processing |
+**🔧 Powered by MCP (Model Context Protocol)**
+
+DeepCode leverages the **Model Context Protocol (MCP)** standard to seamlessly integrate with various tools and services. This standardized approach ensures reliable communication between AI agents and external systems, enabling powerful automation capabilities.
+
+##### 📡 **MCP Servers & Tools**
+
+| 🛠️ **MCP Server** | 🔧 **Primary Function** | 💡 **Purpose & Capabilities** |
+|-------------------|-------------------------|-------------------------------|
+| **🔍 brave** | Web Search Engine | Real-time information retrieval via Brave Search API |
+| **🌐 bocha-mcp** | Alternative Search | Secondary search option with independent API access |
+| **📂 filesystem** | File System Operations | Local file and directory management, read/write operations |
+| **🌐 fetch** | Web Content Retrieval | Fetch and extract content from URLs and web resources |
+| **📥 github-downloader** | Repository Management | Clone and download GitHub repositories for analysis |
+| **📋 file-downloader** | Document Processing | Download and convert files (PDF, DOCX, etc.) to Markdown |
+| **⚡ command-executor** | System Commands | Execute bash/shell commands for environment management |
+| **🧬 code-implementation** | Code Generation Hub | Comprehensive code reproduction with execution and testing |
+| **📚 code-reference-indexer** | Smart Code Search | Intelligent indexing and search of code repositories |
+
+##### 🔧 **Legacy Tool Functions** *(for reference)*
+
+| 🛠️ **Function** | 🎯 **Usage Context** |
+|-----------------|---------------------|
+| **📄 read_code_mem** | Efficient code context retrieval from memory |
+| **✍️ write_file** | Direct file content generation and modification |
+| **🐍 execute_python** | Python code testing and validation |
+| **📁 get_file_structure** | Project structure analysis and organization |
+| **⚙️ set_workspace** | Dynamic workspace and environment configuration |
+| **📊 get_operation_history** | Process monitoring and operation tracking |
 
 
 ---

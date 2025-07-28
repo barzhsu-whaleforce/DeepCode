@@ -406,9 +406,9 @@ async def run_code_analyzer(paper_dir: str, logger) -> str:
         llm_factory=get_preferred_llm_class(),
     )
 
-    # Set higher token output limit
+    # Set appropriate token output limit for Claude models (max 8192)
     enhanced_params = RequestParams(
-        max_tokens=26384,
+        max_tokens=8192,  # Adjusted to Claude 3.5 Sonnet's actual limit
         temperature=0.3,
     )
 
