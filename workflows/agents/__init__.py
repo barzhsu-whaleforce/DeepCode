@@ -1,6 +1,5 @@
 """
 Agents Package for Code Implementation Workflow
-代码实现工作流的代理包
 
 This package contains specialized agents for different aspects of code implementation:
 - CodeImplementationAgent: Handles file-by-file code generation

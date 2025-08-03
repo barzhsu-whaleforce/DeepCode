@@ -1,6 +1,5 @@
 """
 Concise Memory Agent for Code Implementation Workflow
-简洁的代码实现工作流内存代理
 
 This memory agent implements a focused approach:
 1. Before first file: Normal conversation flow
@@ -406,7 +405,6 @@ class ConciseMemoryAgent:
     ) -> Dict[str, Any]:
         """
         Call LLM for code implementation summary generation ONLY
-        调用LLM生成代码实现总结（仅用于代码总结）
 
         This method is used only for creating code implementation summaries,
         NOT for conversation summarization which has been removed.
