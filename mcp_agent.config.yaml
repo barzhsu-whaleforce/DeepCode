@@ -83,5 +83,8 @@ mcp:
       env:
         PYTHONPATH: .
 openai:
-  default_model: anthropic/claude-sonnet-4
+  default_model: "anthropic/claude-sonnet-4"
 planning_mode: traditional
+
+anthropic:
+  default_model: ""
