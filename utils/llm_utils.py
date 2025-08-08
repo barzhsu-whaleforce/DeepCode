@@ -187,6 +187,12 @@ def get_adaptive_agent_config(
             config["algorithm_analysis"].append("document-segmentation")
         if "document-segmentation" not in config["code_planner"]:
             config["code_planner"].append("document-segmentation")
+    else:
+        config["concept_analysis"] = ["filesystem"]
+        if "filesystem" not in config["algorithm_analysis"]:
+            config["algorithm_analysis"].append("filesystem")
+        if "filesystem" not in config["code_planner"]:
+            config["code_planner"].append("filesystem")
 
     return config
 
