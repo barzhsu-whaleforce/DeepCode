@@ -430,8 +430,13 @@ async def read_code_mem(file_paths: List[str]) -> str:
     """
     try:
         if not file_paths or not isinstance(file_paths, list):
-            result = {"status": "error", "message": "file_paths parameter is required and must be a list"}
-            log_operation("read_code_mem_error", {"error": "missing_or_invalid_file_paths"})
+            result = {
+                "status": "error",
+                "message": "file_paths parameter is required and must be a list",
+            }
+            log_operation(
+                "read_code_mem_error", {"error": "missing_or_invalid_file_paths"}
+            )
             return json.dumps(result, ensure_ascii=False, indent=2)
 
         # Remove duplicates while preserving order
@@ -449,10 +454,11 @@ async def read_code_mem(file_paths: List[str]) -> str:
                 "status": "no_summary",
                 "file_paths": unique_file_paths,
                 "message": "No summary file found.",
-                "results": []
+                "results": [],
             }
             log_operation(
-                "read_code_mem", {"file_paths": unique_file_paths, "status": "no_summary_file"}
+                "read_code_mem",
+                {"file_paths": unique_file_paths, "status": "no_summary_file"},
             )
             return json.dumps(result, ensure_ascii=False, indent=2)
 
@@ -465,27 +471,30 @@ async def read_code_mem(file_paths: List[str]) -> str:
                 "status": "no_summary",
                 "file_paths": unique_file_paths,
                 "message": "Summary file is empty.",
-                "results": []
+                "results": [],
             }
             log_operation(
-                "read_code_mem", {"file_paths": unique_file_paths, "status": "empty_summary"}
+                "read_code_mem",
+                {"file_paths": unique_file_paths, "status": "empty_summary"},
             )
             return json.dumps(result, ensure_ascii=False, indent=2)
 
         # Process each file path and collect results
         results = []
         summaries_found = 0
-        
+
         for file_path in unique_file_paths:
             # Extract file-specific section from summary
-            file_section = _extract_file_section_from_summary(summary_content, file_path)
-            
+            file_section = _extract_file_section_from_summary(
+                summary_content, file_path
+            )
+
             if file_section:
                 file_result = {
                     "file_path": file_path,
                     "status": "summary_found",
                     "summary_content": file_section,
-                    "message": f"Summary information found for {file_path}"
+                    "message": f"Summary information found for {file_path}",
                 }
                 summaries_found += 1
             else:
@@ -493,9 +502,9 @@ async def read_code_mem(file_paths: List[str]) -> str:
                     "file_path": file_path,
                     "status": "no_summary",
                     "summary_content": None,
-                    "message": f"No summary found for {file_path}"
+                    "message": f"No summary found for {file_path}",
                 }
-            
+
             results.append(file_result)
 
         # Determine overall status
@@ -512,7 +521,7 @@ async def read_code_mem(file_paths: List[str]) -> str:
             "total_requested": len(unique_file_paths),
             "summaries_found": summaries_found,
             "message": f"Found summaries for {summaries_found}/{len(unique_file_paths)} files",
-            "results": results
+            "results": results,
         }
 
         log_operation(
@@ -531,10 +540,14 @@ async def read_code_mem(file_paths: List[str]) -> str:
         result = {
             "status": "error",
             "message": f"Failed to check code memory: {str(e)}",
-            "file_paths": file_paths if isinstance(file_paths, list) else [str(file_paths)],
-            "results": []
+            "file_paths": file_paths
+            if isinstance(file_paths, list)
+            else [str(file_paths)],
+            "results": [],
         }
-        log_operation("read_code_mem_error", {"file_paths": file_paths, "error": str(e)})
+        log_operation(
+            "read_code_mem_error", {"file_paths": file_paths, "error": str(e)}
+        )
         return json.dumps(result, ensure_ascii=False, indent=2)
 
 

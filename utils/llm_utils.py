@@ -53,38 +53,37 @@ def get_preferred_llm_class(config_path: str = "mcp_agent.secrets.yaml") -> Type
         return OpenAIAugmentedLLM
 
 
-def get_default_models(config_path: str = "mcp_agent.config.yaml") -> dict:
+def get_default_models(config_path: str = "mcp_agent.config.yaml"):
     """
-    Get default models configuration from config file.
+    Get default models from configuration file.
 
     Args:
-        config_path: Path to the main configuration file
+        config_path: Path to the configuration file
 
     Returns:
-        dict: Default models configuration
+        dict: Dictionary with 'anthropic' and 'openai' default models
     """
     try:
         if os.path.exists(config_path):
             with open(config_path, "r", encoding="utf-8") as f:
                 config = yaml.safe_load(f)
 
-            # Extract model configurations
-            openai_config = config.get("openai", {})
-            anthropic_config = config.get("anthropic", {})
+            # Handle null values in config sections
+            anthropic_config = config.get("anthropic") or {}
+            openai_config = config.get("openai") or {}
 
-            return {
-                "anthropic": anthropic_config.get(
-                    "default_model", "claude-sonnet-4-20250514"
-                ),
-                "openai": openai_config.get("default_model", "o3-mini"),
-            }
+            anthropic_model = anthropic_config.get(
+                "default_model", "claude-sonnet-4-20250514"
+            )
+            openai_model = openai_config.get("default_model", "o3-mini")
+
+            return {"anthropic": anthropic_model, "openai": openai_model}
         else:
-            print(f"🤖 Config file {config_path} not found, using default models")
+            print(f"Config file {config_path} not found, using default models")
             return {"anthropic": "claude-sonnet-4-20250514", "openai": "o3-mini"}
 
     except Exception as e:
-        print(f"🤖 Error reading config file {config_path}: {e}")
-        print("🤖 Falling back to default models")
+        print(f"❌Error reading config file {config_path}: {e}")
         return {"anthropic": "claude-sonnet-4-20250514", "openai": "o3-mini"}
 
 

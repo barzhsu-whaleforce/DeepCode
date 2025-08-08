@@ -310,7 +310,8 @@ class CodeImplementationAgent:
                         result_data = json.loads(read_code_mem_result)
                         # Check if any summaries were found in the results
                         should_use_summary = (
-                            result_data.get("status") in ["all_summaries_found", "partial_summaries_found"]
+                            result_data.get("status")
+                            in ["all_summaries_found", "partial_summaries_found"]
                             and result_data.get("summaries_found", 0) > 0
                         )
                     except json.JSONDecodeError:
@@ -339,17 +340,25 @@ class CodeImplementationAgent:
                         # Extract the specific file result for the single file we requested
                         file_results = result_data.get("results", [])
                         if file_results and len(file_results) > 0:
-                            specific_result = file_results[0]  # Get the first (and only) result
+                            specific_result = file_results[
+                                0
+                            ]  # Get the first (and only) result
                             # Transform to match the old single-file format for backward compatibility
                             transformed_result = {
                                 "status": specific_result.get("status", "no_summary"),
-                                "file_path": specific_result.get("file_path", file_path),
-                                "summary_content": specific_result.get("summary_content"),
+                                "file_path": specific_result.get(
+                                    "file_path", file_path
+                                ),
+                                "summary_content": specific_result.get(
+                                    "summary_content"
+                                ),
                                 "message": specific_result.get("message", ""),
                                 "original_tool": "read_file",
-                                "optimization": "redirected_to_read_code_mem"
+                                "optimization": "redirected_to_read_code_mem",
                             }
-                            final_result = json.dumps(transformed_result, ensure_ascii=False)
+                            final_result = json.dumps(
+                                transformed_result, ensure_ascii=False
+                            )
                         else:
                             # Fallback if no results
                             result_data["original_tool"] = "read_file"
@@ -942,7 +951,11 @@ class CodeImplementationAgent:
                         json.loads(result) if isinstance(result, str) else result
                     )
 
-                    if result_data.get("status") in ["all_summaries_found", "partial_summaries_found"] and result_data.get("summaries_found", 0) > 0:
+                    if (
+                        result_data.get("status")
+                        in ["all_summaries_found", "partial_summaries_found"]
+                        and result_data.get("summaries_found", 0) > 0
+                    ):
                         summary_files_found += 1
                 except Exception as e:
                     self.logger.warning(
@@ -1042,7 +1055,11 @@ class CodeImplementationAgent:
 
             result_data = json.loads(result) if isinstance(result, str) else result
 
-            return result_data.get("status") in ["all_summaries_found", "partial_summaries_found"] and result_data.get("summaries_found", 0) > 0
+            return (
+                result_data.get("status")
+                in ["all_summaries_found", "partial_summaries_found"]
+                and result_data.get("summaries_found", 0) > 0
+            )
         except Exception as e:
             self.logger.warning(f"Failed to test read_code_mem optimization: {e}")
             return False

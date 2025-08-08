@@ -403,8 +403,6 @@ Requirements:
                     "Analysis loop detected and corrective guidance provided"
                 )
 
-            # Round completed
-
             # Record file implementations in memory agent (for the current round)
             for file_info in code_agent.get_implementation_summary()["completed_files"]:
                 memory_agent.record_file_implementation(file_info["file"])
@@ -434,7 +432,6 @@ Requirements:
                     "Emergency message trim - applying concise memory optimization"
                 )
 
-                # Apply emergency memory optimization
                 current_system_message = code_agent.get_system_prompt()
                 files_implemented_count = code_agent.get_files_implemented_count()
                 messages = memory_agent.apply_memory_optimization(
@@ -534,7 +531,7 @@ Requirements:
                 try:
                     await client.chat.completions.create(
                         model=self.default_models["openai"],
-                        max_tokens=10,
+                        max_tokens=20,
                         messages=[{"role": "user", "content": "test"}],
                     )
                 except Exception as e:
@@ -542,7 +539,7 @@ Requirements:
                         # Retry with max_completion_tokens for models that require it
                         await client.chat.completions.create(
                             model=self.default_models["openai"],
-                            max_completion_tokens=10,
+                            max_completion_tokens=20,
                             messages=[{"role": "user", "content": "test"}],
                         )
                     else:
@@ -635,7 +632,7 @@ Requirements:
         openai_messages = [{"role": "system", "content": system_message}]
         openai_messages.extend(messages)
 
-        # Try max_tokens and temperature first, fallback to max_completion_tokens without temperature if unsupported
+        # Try max_tokens first, fallback to max_completion_tokens if unsupported
         try:
             response = await client.chat.completions.create(
                 model=self.default_models["openai"],
@@ -646,7 +643,7 @@ Requirements:
             )
         except Exception as e:
             if "max_tokens" in str(e) and "max_completion_tokens" in str(e):
-                # Retry with max_completion_tokens and no temperature for models that require it
+                # Retry with max_completion_tokens for models that require it
                 response = await client.chat.completions.create(
                     model=self.default_models["openai"],
                     messages=openai_messages,
