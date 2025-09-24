@@ -62,6 +62,101 @@ from workflows.agents.document_segmentation_agent import prepare_document_segmen
 os.environ["PYTHONDONTWRITEBYTECODE"] = "1"  # Prevent .pyc file generation
 
 
+def _assess_output_completeness(text: str) -> float:
+    """
+    智能评估输出完整性的高级算法
+    
+    使用多种启发式方法来检测输出是否被截断：
+    1. 结构化标记完整性检查
+    2. 句子完整性分析 
+    3. 代码块完整性验证
+    4. 预期内容元素检查
+    
+    Returns:
+        float: 完整性分数 (0.0-1.0)，越高表示越完整
+    """
+    if not text or len(text.strip()) < 100:
+        return 0.0
+    
+    score = 0.0
+    factors = 0
+    
+    # 1. 基本长度检查 (权重: 0.2)
+    if len(text) > 5000:  # 期望的最小输出长度
+        score += 0.2
+    elif len(text) > 2000:
+        score += 0.1
+    factors += 1
+    
+    # 2. 结构完整性检查 (权重: 0.3)
+    structure_indicators = [
+        "## 1.", "## 2.", "## 3.",  # 章节标题
+        "```", "file_structure", "implementation",
+        "algorithm", "method", "function"
+    ]
+    structure_count = sum(1 for indicator in structure_indicators if indicator.lower() in text.lower())
+    if structure_count >= 6:
+        score += 0.3
+    elif structure_count >= 3:
+        score += 0.15
+    factors += 1
+    
+    # 3. 句子完整性检查 (权重: 0.2)
+    lines = text.strip().split('\n')
+    if lines:
+        last_line = lines[-1].strip()
+        # 检查最后一行是否是完整的句子或结构化内容
+        if (last_line.endswith(('.', ':', '```', '!', '?')) or 
+            last_line.startswith(('##', '-', '*', '`')) or
+            len(last_line) < 10):  # 很短的行可能是列表项
+            score += 0.2
+        elif len(last_line) > 50 and not last_line.endswith(('.', ':', '```', '!', '?')):
+            # 长行但没有适当结尾，可能被截断
+            score += 0.05
+    factors += 1
+    
+    # 4. 代码实现计划完整性 (权重: 0.3)
+    implementation_keywords = [
+        "file structure", "architecture", "implementation", 
+        "requirements", "dependencies", "setup", "main",
+        "class", "function", "method", "algorithm"
+    ]
+    impl_count = sum(1 for keyword in implementation_keywords if keyword.lower() in text.lower())
+    if impl_count >= 8:
+        score += 0.3
+    elif impl_count >= 4:
+        score += 0.15
+    factors += 1
+    
+    return min(score, 1.0)  # 确保不超过1.0
+
+
+def _adjust_params_for_retry(params: RequestParams, retry_count: int) -> RequestParams:
+    """
+    动态调整请求参数以提高成功率
+    
+    基于重试次数智能调整参数：
+    - 增加token限制
+    - 调整temperature
+    - 优化其他参数
+    """
+    # 基础token增量：每次重试增加更多tokens
+    token_increment = 4096 * (retry_count + 1)
+    new_max_tokens = min(params.max_tokens + token_increment, 32768)  # 不超过32K的合理限制
+    
+    # 随着重试次数增加，降低temperature以获得更一致的输出
+    new_temperature = max(params.temperature - (retry_count * 0.1), 0.1)
+    
+    print(f"🔧 Adjusting parameters for retry {retry_count + 1}:")
+    print(f"   Token limit: {params.max_tokens} → {new_max_tokens}")
+    print(f"   Temperature: {params.temperature} → {new_temperature}")
+    
+    return RequestParams(
+        max_tokens=new_max_tokens,
+        temperature=new_temperature,
+    )
+
+
 def get_default_search_server(config_path: str = "mcp_agent.config.yaml"):
     """
     Get the default search server from configuration.
@@ -382,10 +477,22 @@ async def run_code_analyzer(
         llm_factory=get_preferred_llm_class(),
     )
 
-    # Set appropriate token output limit for Claude models (max 8192)
+    # Advanced token management system with dynamic scaling
+    # 检查是否使用分段模式以动态调整token限制
+    if use_segmentation:
+        # 分段模式：可以使用更高的token限制，因为输入已经被优化
+        max_tokens_limit = 16384  # 使用更高限制，因为分段减少了输入复杂性
+        temperature = 0.2  # 稍微降低temperature以提高一致性
+        print("🧠 Using SEGMENTED mode: Higher token limit (16384) with optimized inputs")
+    else:
+        # 传统模式：使用保守的token限制并启用增量生成
+        max_tokens_limit = 12288  # 中等限制，为聚合输出留出空间
+        temperature = 0.3
+        print("🧠 Using TRADITIONAL mode: Moderate token limit (12288)")
+    
     enhanced_params = RequestParams(
-        max_tokens=8192,  # Adjusted to Claude 3.5 Sonnet's actual limit
-        temperature=0.3,
+        max_tokens=max_tokens_limit,
+        temperature=temperature,
     )
 
     # Concise message for multi-agent paper analysis and code planning
@@ -399,10 +506,38 @@ Please locate and analyze the markdown (.md) file containing the research paper.
 
 The goal is to create a reproduction plan detailed enough for independent implementation."""
 
-    result = await code_aggregator_agent.generate_str(
-        message=message, request_params=enhanced_params
-    )
-    print(f"Code analysis result: {result}")
+    # 智能输出完整性检查和重试机制
+    max_retries = 3
+    retry_count = 0
+    
+    while retry_count < max_retries:
+        try:
+            print(f"🚀 Attempting code analysis (attempt {retry_count + 1}/{max_retries})")
+            result = await code_aggregator_agent.generate_str(
+                message=message, request_params=enhanced_params
+            )
+            
+            # 检查输出完整性的高级指标
+            completeness_score = _assess_output_completeness(result)
+            print(f"📊 Output completeness score: {completeness_score:.2f}/1.0")
+            
+            if completeness_score >= 0.8:  # 输出被认为是完整的
+                print(f"✅ Code analysis completed successfully (length: {len(result)} chars)")
+                return result
+            else:
+                print(f"⚠️ Output appears truncated (score: {completeness_score:.2f}), retrying with enhanced parameters...")
+                # 动态调整参数进行重试
+                enhanced_params = _adjust_params_for_retry(enhanced_params, retry_count)
+                retry_count += 1
+                
+        except Exception as e:
+            print(f"❌ Error in code analysis attempt {retry_count + 1}: {e}")
+            retry_count += 1
+            if retry_count >= max_retries:
+                raise
+    
+    # 如果所有重试都失败，返回最后一次的结果
+    print(f"⚠️ Returning potentially incomplete result after {max_retries} attempts")
     return result
 
 
