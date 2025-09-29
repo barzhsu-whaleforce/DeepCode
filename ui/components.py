@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Streamlit UI Components Module
 
@@ -12,13 +13,30 @@ import json
 
 
 def display_header():
-    """Display application header"""
+    """Display modern, compact application header"""
     st.markdown(
         """
-    <div class="main-header">
-        <h1>🧬 DeepCode</h1>
-        <h3>OPEN-SOURCE CODE AGENT</h3>
-        <p>⚡ DATA INTELLIGENCE LAB @ HKU • REVOLUTIONIZING RESEARCH REPRODUCIBILITY ⚡</p>
+    <div class="modern-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-animation">
+                    <div class="dna-helix">
+                        <div class="helix-strand strand-1"></div>
+                        <div class="helix-strand strand-2"></div>
+                    </div>
+                    <span class="logo-text">◊ DeepCode</span>
+                </div>
+                <div class="tagline">
+                    <span class="highlight">AI Research Engine</span>
+                    <span class="separator">•</span>
+                    <span class="org">Data Intelligence Lab @ HKU</span>
+                </div>
+            </div>
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                <span class="status-text">ONLINE</span>
+            </div>
+        </div>
     </div>
     """,
         unsafe_allow_html=True,
@@ -26,368 +44,62 @@ def display_header():
 
 
 def display_features():
-    """Display DeepCode AI Agent capabilities"""
-    # AI Agent core capabilities display area - updated to match README content
+    """Display DeepCode AI capabilities with world-class, futuristic design"""
+
+    # Capability Matrix
     st.markdown(
         """
-    <div class="ai-capabilities-section">
-        <div class="neural-network">
-            <div class="neuron pulse-1"></div>
-            <div class="neuron pulse-2"></div>
-            <div class="neuron pulse-3"></div>
+        <div class="capability-matrix">
+            <div class="capability-node research-node">
+                <div class="node-core">
+                    <div class="core-pulse"></div>
+                    <div class="core-label">RESEARCH</div>
+                </div>
+                <div class="node-description">
+                    <h3>Paper2Code&Text2Code</h3>
+                    <p>Neural document processing and algorithmic synthesis</p>
+                </div>
+                <div class="node-metrics">
+                    <span class="metric">Multi-Agents</span>
+                </div>
+            </div>
+
+
         </div>
-        <h2 class="capabilities-title">🧠 Open Agentic Coding Platform</h2>
-        <p class="capabilities-subtitle">Advancing Code Generation with Multi-Agent Systems</p>
-    </div>
     """,
         unsafe_allow_html=True,
     )
 
-    # Core functionality modules - Vertical Layout
+    # Processing Pipeline
     st.markdown(
         """
-    <div class="feature-card-vertical primary">
-        <div class="card-glow-vertical"></div>
-        <div class="feature-header">
-            <div class="feature-logo-container">
-                <div class="ai-brain-logo">
-                    <div class="brain-node node-1"></div>
-                    <div class="brain-node node-2"></div>
-                    <div class="brain-node node-3"></div>
-                    <div class="brain-connection conn-1"></div>
-                    <div class="brain-connection conn-2"></div>
-                </div>
-                <div class="feature-icon-large">🚀</div>
+        <div class="processing-pipeline">
+            <div class="pipeline-stage stage-requirements">
+                <div class="stage-core">REQUIREMENTS</div>
+                <div class="stage-description">Input Requirements</div>
             </div>
-            <div class="feature-header-content">
-                <h3 class="feature-title-large">Paper2Code: Research-to-Production Pipeline</h3>
-                <p class="feature-subtitle">Automated Implementation of Complex Algorithms</p>
+            <div class="pipeline-flow">
+                <div class="flow-particle"></div>
             </div>
-            <div class="feature-stats">
-                <div class="stat-item">
-                    <span class="stat-number typing-number">Multi-Modal</span>
-                    <span class="stat-label">Analysis</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number typing-number">Production</span>
-                    <span class="stat-label">Ready</span>
-                </div>
+            <div class="pipeline-stage stage-planning">
+                <div class="stage-core">PLANNING</div>
+                <div class="stage-description">Design & Planning</div>
             </div>
-        </div>
-        <div class="feature-content">
-            <div class="content-left">
-                <p class="feature-description-large">Multi-modal document analysis engine that extracts algorithmic logic and mathematical models from academic papers, generating optimized implementations with proper data structures while preserving computational complexity characteristics.</p>
-                <div class="feature-flow">
-                    <div class="flow-step active">
-                        <div class="flow-icon">📄</div>
-                        <span>Document Parsing</span>
-                    </div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step active">
-                        <div class="flow-icon">🧠</div>
-                        <span>Algorithm Extraction</span>
-                    </div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step active">
-                        <div class="flow-icon">⚡</div>
-                        <span>Code Synthesis</span>
-                    </div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step active">
-                        <div class="flow-icon">✅</div>
-                        <span>Quality Assurance</span>
-                    </div>
-                </div>
+            <div class="pipeline-flow">
+                <div class="flow-particle"></div>
             </div>
-            <div class="content-right">
-                <div class="code-simulation">
-                    <div class="code-header">
-                        <span class="code-lang">Python</span>
-                        <div class="code-status generating">Generating...</div>
-                    </div>
-                    <div class="code-lines">
-                        <div class="code-line typing">import torch</div>
-                        <div class="code-line typing delay-1">import torch.nn as nn</div>
-                        <div class="code-line typing delay-2">class ResearchAlgorithm(nn.Module):</div>
-                        <div class="code-line typing delay-3">    def __init__(self, config):</div>
-                        <div class="code-line typing delay-4">        super().__init__()</div>
-                    </div>
-                </div>
+            <div class="pipeline-stage stage-implementation">
+                <div class="stage-core">IMPLEMENTATION</div>
+                <div class="stage-description">Code Implementation</div>
+            </div>
+            <div class="pipeline-flow">
+                <div class="flow-particle"></div>
+            </div>
+            <div class="pipeline-stage stage-validation">
+                <div class="stage-core">VALIDATION</div>
+                <div class="stage-description">Validation & Refinement</div>
             </div>
         </div>
-    </div>
-    """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        """
-    <div class="feature-card-vertical secondary">
-        <div class="card-glow-vertical"></div>
-        <div class="feature-header">
-            <div class="feature-logo-container">
-                <div class="multi-agent-logo">
-                    <div class="agent-node agent-1">🎨</div>
-                    <div class="agent-node agent-2">💻</div>
-                    <div class="agent-node agent-3">⚡</div>
-                    <div class="agent-connection conn-12"></div>
-                    <div class="agent-connection conn-23"></div>
-                    <div class="agent-connection conn-13"></div>
-                </div>
-                <div class="feature-icon-large">🎨</div>
-            </div>
-            <div class="feature-header-content">
-                <h3 class="feature-title-large">Text2Web: Automated Prototyping Engine</h3>
-                <p class="feature-subtitle">Natural Language to Front-End Code Synthesis</p>
-            </div>
-            <div class="feature-stats">
-                <div class="stat-item">
-                    <span class="stat-number typing-number">Intelligent</span>
-                    <span class="stat-label">Scaffolding</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number typing-number">Scalable</span>
-                    <span class="stat-label">Architecture</span>
-                </div>
-            </div>
-        </div>
-        <div class="feature-content">
-            <div class="content-left">
-                <p class="feature-description-large">Context-aware code generation using fine-tuned language models. Intelligent scaffolding system generating complete application structures including frontend components, maintaining architectural consistency across modules.</p>
-                <div class="agent-grid">
-                    <div class="agent-card active">
-                        <div class="agent-avatar">📝</div>
-                        <h4>Intent Understanding</h4>
-                        <p>Semantic analysis of requirements</p>
-                    </div>
-                    <div class="agent-card active">
-                        <div class="agent-avatar">🎨</div>
-                        <h4>UI Architecture</h4>
-                        <p>Component design & structure</p>
-                    </div>
-                    <div class="agent-card active">
-                        <div class="agent-avatar">💻</div>
-                        <h4>Code Generation</h4>
-                        <p>Functional interface creation</p>
-                    </div>
-                    <div class="agent-card active">
-                        <div class="agent-avatar">✨</div>
-                        <h4>Quality Assurance</h4>
-                        <p>Automated testing & validation</p>
-                    </div>
-                </div>
-            </div>
-            <div class="content-right">
-                <div class="collaboration-viz">
-                    <div class="collaboration-center">
-                        <div class="center-node">🎯</div>
-                        <span>Web Application</span>
-                    </div>
-                    <div class="collaboration-agents">
-                        <div class="collab-agent agent-pos-1">
-                            <div class="pulse-ring"></div>
-                            📝
-                        </div>
-                        <div class="collab-agent agent-pos-2">
-                            <div class="pulse-ring"></div>
-                            🏗️
-                        </div>
-                        <div class="collab-agent agent-pos-3">
-                            <div class="pulse-ring"></div>
-                            ⚙️
-                        </div>
-                        <div class="collab-agent agent-pos-4">
-                            <div class="pulse-ring"></div>
-                            🧪
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        """
-    <div class="feature-card-vertical accent">
-        <div class="card-glow-vertical"></div>
-        <div class="feature-header">
-            <div class="feature-logo-container">
-                <div class="future-logo">
-                    <div class="orbit orbit-1">
-                        <div class="orbit-node">⚙️</div>
-                    </div>
-                    <div class="orbit orbit-2">
-                        <div class="orbit-node">🔧</div>
-                    </div>
-                    <div class="orbit-center">🚀</div>
-                </div>
-                <div class="feature-icon-large">⚙️</div>
-            </div>
-            <div class="feature-header-content">
-                <h3 class="feature-title-large">Text2Backend: Scalable Architecture Generator</h3>
-                <p class="feature-subtitle">Intelligent Server-Side Development</p>
-            </div>
-            <div class="feature-stats">
-                <div class="stat-item">
-                    <span class="stat-number typing-number">Database</span>
-                    <span class="stat-label">Integration</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number typing-number">API</span>
-                    <span class="stat-label">Endpoints</span>
-                </div>
-            </div>
-        </div>
-        <div class="feature-content">
-            <div class="content-left">
-                <p class="feature-description-large">Generates efficient, scalable backend systems with database schemas, API endpoints, and microservices architecture. Uses dependency analysis to ensure scalable architecture from initial generation with comprehensive testing.</p>
-                <div class="vision-demo">
-                    <div class="demo-input">
-                        <div class="input-icon">💬</div>
-                        <div class="input-text typing">"Build a scalable e-commerce API with user authentication and payment processing"</div>
-                    </div>
-                    <div class="demo-arrow">⬇️</div>
-                    <div class="demo-output">
-                        <div class="output-items">
-                            <div class="output-item">🏗️ Microservices Architecture</div>
-                            <div class="output-item">🔒 Authentication & Security</div>
-                            <div class="output-item">🗄️ Database Schema Design</div>
-                            <div class="output-item">📊 API Documentation & Testing</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="content-right">
-                <div class="future-timeline">
-                    <div class="timeline-item completed">
-                        <div class="timeline-marker">✅</div>
-                        <div class="timeline-content">
-                            <h4>API Design</h4>
-                            <p>RESTful endpoints</p>
-                        </div>
-                    </div>
-                    <div class="timeline-item completed">
-                        <div class="timeline-marker">✅</div>
-                        <div class="timeline-content">
-                            <h4>Database Layer</h4>
-                            <p>Schema & relationships</p>
-                        </div>
-                    </div>
-                    <div class="timeline-item active">
-                        <div class="timeline-marker">🔄</div>
-                        <div class="timeline-content">
-                            <h4>Security Layer</h4>
-                            <p>Authentication & authorization</p>
-                        </div>
-                    </div>
-                    <div class="timeline-item future">
-                        <div class="timeline-marker">🚀</div>
-                        <div class="timeline-content">
-                            <h4>Deployment</h4>
-                            <p>CI/CD integration</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        """
-    <div class="feature-card-vertical tech">
-        <div class="card-glow-vertical"></div>
-        <div class="feature-header">
-            <div class="feature-logo-container">
-                <div class="opensource-logo">
-                    <div class="github-stars">
-                        <div class="star star-1">📄</div>
-                        <div class="star star-2">🤖</div>
-                        <div class="star star-3">⚡</div>
-                    </div>
-                    <div class="community-nodes">
-                        <div class="community-node">🧠</div>
-                        <div class="community-node">🔍</div>
-                        <div class="community-node">⚙️</div>
-                    </div>
-                </div>
-                <div class="feature-icon-large">🎯</div>
-            </div>
-            <div class="feature-header-content">
-                <h3 class="feature-title-large">CodeRAG Integration System</h3>
-                <p class="feature-subtitle">Advanced Multi-Agent Orchestration</p>
-            </div>
-            <div class="feature-stats">
-                <div class="stat-item">
-                    <span class="stat-number typing-number">Global</span>
-                    <span class="stat-label">Code Analysis</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number typing-number">Intelligent</span>
-                    <span class="stat-label">Orchestration</span>
-                </div>
-            </div>
-        </div>
-        <div class="feature-content">
-            <div class="content-left">
-                <p class="feature-description-large">Advanced retrieval-augmented generation combining semantic vector embeddings with graph-based dependency analysis. Central orchestrating agent coordinates specialized agents with dynamic task planning and intelligent memory management.</p>
-                <div class="community-features">
-                    <div class="community-feature">
-                        <div class="feature-icon-small">🧠</div>
-                        <div class="feature-text">
-                            <h4>Intelligent Orchestration</h4>
-                            <p>Central decision-making with dynamic planning algorithms</p>
-                        </div>
-                    </div>
-                    <div class="community-feature">
-                        <div class="feature-icon-small">🔍</div>
-                        <div class="feature-text">
-                            <h4>CodeRAG System</h4>
-                            <p>Semantic analysis with dependency graph mapping</p>
-                        </div>
-                    </div>
-                    <div class="community-feature">
-                        <div class="feature-icon-small">⚡</div>
-                        <div class="feature-text">
-                            <h4>Quality Assurance</h4>
-                            <p>Automated testing, validation, and documentation</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="content-right">
-                <div class="tech-ecosystem">
-                    <div class="ecosystem-center">
-                        <div class="center-logo">🧠</div>
-                        <span>Multi-Agent Engine</span>
-                    </div>
-                    <div class="ecosystem-ring">
-                        <div class="ecosystem-item item-1">
-                            <div class="item-icon">🎯</div>
-                            <span>Central Orchestration</span>
-                        </div>
-                        <div class="ecosystem-item item-2">
-                            <div class="item-icon">📝</div>
-                            <span>Intent Understanding</span>
-                        </div>
-                        <div class="ecosystem-item item-3">
-                            <div class="item-icon">🔍</div>
-                            <span>Code Mining & Indexing</span>
-                        </div>
-                        <div class="ecosystem-item item-4">
-                            <div class="item-icon">🧬</div>
-                            <span>Code Generation</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     """,
         unsafe_allow_html=True,
     )

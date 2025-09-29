@@ -24,12 +24,17 @@ from .styles import get_main_styles
 
 
 def setup_page_config():
-    """Setup page configuration"""
+    """Setup optimized page configuration"""
     st.set_page_config(
         page_title="DeepCode - AI Research Engine",
         page_icon="🧬",
         layout="wide",
         initial_sidebar_state="expanded",
+        menu_items={
+            "Get Help": "https://github.com/yourusername/deepcode",
+            "Report a bug": "https://github.com/yourusername/deepcode/issues",
+            "About": "# DeepCode AI Research Engine\nNext-Generation Multi-Agent Coding Platform",
+        },
     )
 
 
@@ -39,11 +44,24 @@ def apply_custom_styles():
 
 
 def render_main_content():
-    """Render main content area"""
-    # Display header and features
+    """Render main content area with improved layout"""
+    # Display modern, compact header and features
     display_header()
     display_features()
-    st.markdown("---")
+
+    # Add subtle spacing instead of heavy divider
+    st.markdown(
+        """
+        <div style="height: 2rem; background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(100, 181, 246, 0.1) 50%,
+            transparent 100%);
+            margin: 1.5rem 0;
+            border-radius: 2px;">
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     # Display results if available
     if st.session_state.show_results and st.session_state.last_result:
