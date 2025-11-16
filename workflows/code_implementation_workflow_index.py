@@ -290,16 +290,21 @@ Requirements:
         target_directory,
     ):
         """Pure code implementation loop with memory optimization and phase consistency"""
-        max_iterations = 500
+        max_iterations = 800
         iteration = 0
         start_time = time.time()
-        max_time = 2400  # 40 minutes
+        max_time = 7200  # 120 minutes (2 hours)
 
         # Initialize specialized agents
         code_agent = CodeImplementationAgent(
             self.mcp_agent, self.logger, self.enable_read_tools
         )
-        memory_agent = ConciseMemoryAgent(plan_content, self.logger, target_directory)
+        
+        # Pass code_directory to memory agent for file extraction
+        code_directory = os.path.join(target_directory, "generate_code")
+        memory_agent = ConciseMemoryAgent(
+            plan_content, self.logger, target_directory, self.default_models, code_directory
+        )
 
         # Log read tools configuration
         read_tools_status = "ENABLED" if self.enable_read_tools else "DISABLED"
@@ -399,12 +404,12 @@ Requirements:
                 messages.append({"role": "user", "content": no_tools_guidance})
 
             # Check for analysis loop and provide corrective guidance
-            if code_agent.is_in_analysis_loop():
-                analysis_loop_guidance = code_agent.get_analysis_loop_guidance()
-                messages.append({"role": "user", "content": analysis_loop_guidance})
-                self.logger.warning(
-                    "Analysis loop detected and corrective guidance provided"
-                )
+            # if code_agent.is_in_analysis_loop():
+            #     analysis_loop_guidance = code_agent.get_analysis_loop_guidance()
+            #     messages.append({"role": "user", "content": analysis_loop_guidance})
+            #     self.logger.warning(
+            #         "Analysis loop detected and corrective guidance provided"
+            #     )
 
             # Record file implementations in memory agent (for the current round)
             for file_info in code_agent.get_implementation_summary()["completed_files"]:
@@ -416,17 +421,10 @@ Requirements:
             # Start new round for next iteration, sync with workflow iteration
             memory_agent.start_new_round(iteration=iteration)
 
-            # Check completion
-            if any(
-                keyword in response_content.lower()
-                for keyword in [
-                    "all files implemented",
-                    "all phases completed",
-                    "reproduction plan fully implemented",
-                    "all code of repo implementation complete",
-                ]
-            ):
-                self.logger.info("Code implementation declared complete")
+            # Check completion based on actual unimplemented files list
+            unimplemented_files = memory_agent.get_unimplemented_files()
+            if not unimplemented_files:  # Empty list means all files implemented
+                self.logger.info(f"✅ Code implementation complete - All files implemented")
                 break
 
             # Emergency trim if too long
@@ -529,27 +527,31 @@ Requirements:
                 else:
                     client = AsyncOpenAI(api_key=openai_key)
 
+                # Get model name from config
+                model_name = self.default_models.get("openai", "o3-mini")
+
                 # Test connection with default model from config
                 # Try max_tokens first, fallback to max_completion_tokens if unsupported
                 try:
                     await client.chat.completions.create(
-                        model=self.default_models["openai"],
+                        model=model_name,
                         max_tokens=20,
                         messages=[{"role": "user", "content": "test"}],
                     )
                 except Exception as e:
                     if "max_tokens" in str(e) and "max_completion_tokens" in str(e):
                         # Retry with max_completion_tokens for models that require it
+                        self.logger.info(
+                            f"Model {model_name} requires max_completion_tokens parameter"
+                        )
                         await client.chat.completions.create(
-                            model=self.default_models["openai"],
+                            model=model_name,
                             max_completion_tokens=20,
                             messages=[{"role": "user", "content": "test"}],
                         )
                     else:
                         raise
-                self.logger.info(
-                    f"Using OpenAI API with model: {self.default_models['openai']}"
-                )
+                self.logger.info(f"Using OpenAI API with model: {model_name}")
                 if base_url:
                     self.logger.info(f"Using custom base URL: {base_url}")
                 return client, "openai"
@@ -877,8 +879,29 @@ Requirements:
         return valid_messages
 
     def _prepare_mcp_tool_definitions(self) -> List[Dict[str, Any]]:
-        """Prepare tool definitions in Anthropic API standard format"""
-        return get_mcp_tools("code_implementation")
+
+        """Prepare tool definitions in Anthropic API standard format with filtering"""
+        # Get all available tools
+        all_tools = get_mcp_tools("code_implementation")
+        
+        # Define essential tools for code implementation
+        essential_tool_names = {
+            "write_file",
+            "search_code_references"
+        }
+        
+        # Filter to only essential tools
+        filtered_tools = [
+            tool for tool in all_tools 
+            if tool.get("name") in essential_tool_names
+        ]
+        
+        self.logger.info(f"🔧 Tool filtering: {len(filtered_tools)}/{len(all_tools)} tools enabled")
+        self.logger.info(f"   Available tools: {[tool.get('name') for tool in filtered_tools]}")
+        
+        return filtered_tools
+        
+        # return get_mcp_tools("code_implementation")
 
     def _check_tool_results_for_errors(self, tool_results: List[Dict]) -> bool:
         """Check tool results for errors with JSON repair capability"""
@@ -1155,10 +1178,10 @@ async def main():
         # Ask if user wants to continue with actual workflow
         print("\nContinuing with workflow execution...")
 
-        plan_file = "/Users/lizongwei/Reasearch/DeepCode_Base/DeepCode/deepcode_lab/papers/1/initial_plan.txt"
+        plan_file = "/data2/bjdwhzzh/project-hku/Deepcode_collections/DeepCode/deepcode_lab/papers/54_only_code_gen/initial_plan.txt"
         # plan_file = "/data2/bjdwhzzh/project-hku/Code-Agent2.0/Code-Agent/deepcode-mcp/agent_folders/papers/1/initial_plan.txt"
         target_directory = (
-            "/Users/lizongwei/Reasearch/DeepCode_Base/DeepCode/deepcode_lab/papers/1/"
+            "/data2/bjdwhzzh/project-hku/Deepcode_collections/DeepCode/deepcode_lab/papers/54_only_code_gen/"
         )
         print("Implementation Mode Selection:")
         print("1. Pure Code Implementation Mode (Recommended)")

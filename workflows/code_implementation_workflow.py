@@ -298,8 +298,11 @@ Requirements:
         code_agent = CodeImplementationAgent(
             self.mcp_agent, self.logger, self.enable_read_tools
         )
+        
+        # Pass code_directory to memory agent for file extraction
+        code_directory = os.path.join(target_directory, "generate_code")
         memory_agent = ConciseMemoryAgent(
-            plan_content, self.logger, target_directory, self.default_models
+            plan_content, self.logger, target_directory, self.default_models, code_directory
         )
 
         # Log read tools configuration
@@ -399,13 +402,13 @@ Requirements:
                 no_tools_guidance = self._generate_no_tools_guidance(files_count)
                 messages.append({"role": "user", "content": no_tools_guidance})
 
-            # Check for analysis loop and provide corrective guidance
-            if code_agent.is_in_analysis_loop():
-                analysis_loop_guidance = code_agent.get_analysis_loop_guidance()
-                messages.append({"role": "user", "content": analysis_loop_guidance})
-                self.logger.warning(
-                    "Analysis loop detected and corrective guidance provided"
-                )
+            # # Check for analysis loop and provide corrective guidance
+            # if code_agent.is_in_analysis_loop():
+            #     analysis_loop_guidance = code_agent.get_analysis_loop_guidance()
+            #     messages.append({"role": "user", "content": analysis_loop_guidance})
+            #     self.logger.warning(
+            #         "Analysis loop detected and corrective guidance provided"
+            #     )
 
             # Record file implementations in memory agent (for the current round)
             for file_info in code_agent.get_implementation_summary()["completed_files"]:
@@ -417,17 +420,10 @@ Requirements:
             # Start new round for next iteration, sync with workflow iteration
             memory_agent.start_new_round(iteration=iteration)
 
-            # Check completion
-            if any(
-                keyword in response_content.lower()
-                for keyword in [
-                    "all files implemented",
-                    "all phases completed",
-                    "reproduction plan fully implemented",
-                    "all code of repo implementation complete",
-                ]
-            ):
-                self.logger.info("Code implementation declared complete")
+            # Check completion based on actual unimplemented files list
+            unimplemented_files = memory_agent.get_unimplemented_files()
+            if not unimplemented_files:  # Empty list means all files implemented
+                self.logger.info(f"✅ Code implementation complete - All files implemented")
                 break
 
             # Emergency trim if too long
@@ -943,11 +939,7 @@ Requirements:
 ⚡ **Decision Process:**
 1. **If ALL files implemented:** Reply with "All files implemented" to complete the task
 2. **If MORE files need implementation:** Continue with dependency-aware workflow:
-   - **Start with `read_code_mem`** to understand existing implementations and dependencies
-   - **Then `write_file`** to implement the new component
-   - **Finally: Test** if needed
-
-💡 **Key Point:** Always verify completion status before continuing with new file creation."""
+   - **Use `write_file` to implement the new component"""
 
     def _generate_error_guidance(self) -> str:
         """Generate error guidance for handling issues"""
@@ -959,11 +951,8 @@ Requirements:
 3. **Check if ALL files from the reproduction plan are implemented:**
    - **If YES:** Respond "**implementation complete**" to end the conversation
    - **If NO:** Continue with proper development cycle for next file:
-     - **Start with `read_code_mem`** to understand existing implementations
-     - **Then `write_file`** to implement properly
-4. Ensure proper error handling in future implementations
-
-💡 **Remember:** Always verify if all planned files are implemented before continuing with new file creation."""
+     - **Use `write_file` to implement properly
+4. Ensure proper error handling in future implementations"""
 
     def _generate_no_tools_guidance(self, files_count: int) -> str:
         """Generate concise guidance when no tools are called"""
@@ -976,9 +965,7 @@ Requirements:
 ⚡ **Decision Process:**
 1. **If ALL files from plan are implemented:** Reply "All files implemented" to complete
 2. **If MORE files need implementation:** Use tools to continue:
-   - **Start with `read_code_mem`** to understand existing implementations
-   - **Then `write_file`** to implement the new component
-   - **Finally: Test** if needed
+   - **Use `write_file` to implement the new component
 
 🚨 **Critical:** Don't just explain - either declare completion or use tools!"""
 
@@ -1146,66 +1133,69 @@ async def main():
 
     # print("Running Code Reference Indexer Integration Test...")
 
-    test_success = True
-    if test_success:
-        print("\n" + "=" * 60)
-        print("🎉 UNIFIED Code Reference Indexer Integration Test PASSED!")
-        print("🔧 Three-step process successfully merged into ONE tool")
-        print("=" * 60)
 
-        # Ask if user wants to continue with actual workflow
-        print("\nContinuing with workflow execution...")
 
-        plan_file = "/Users/lizongwei/Desktop/DeepCode_Project/workbase/DeepCode/deepcode_lab/papers/1/initial_plan.txt"
-        # plan_file = "/data2/bjdwhzzh/project-hku/Code-Agent2.0/Code-Agent/deepcode-mcp/agent_folders/papers/1/initial_plan.txt"
-        target_directory = "/Users/lizongwei/Desktop/DeepCode_Project/workbase/DeepCode/deepcode_lab/papers/1/"
-        print("Implementation Mode Selection:")
-        print("1. Pure Code Implementation Mode (Recommended)")
-        print("2. Iterative Implementation Mode")
 
-        pure_code_mode = True
-        mode_name = "Pure Code Implementation Mode with Memory Agent Architecture + Code Reference Indexer"
-        print(f"Using: {mode_name}")
+    # test_success = True
+    # if test_success:
+    #     print("\n" + "=" * 60)
+    #     print("🎉 UNIFIED Code Reference Indexer Integration Test PASSED!")
+    #     print("🔧 Three-step process successfully merged into ONE tool")
+    #     print("=" * 60)
 
-        # Configure read tools - modify this parameter to enable/disable read tools
-        enable_read_tools = (
-            True  # Set to False to disable read_file and read_code_mem tools
-        )
-        read_tools_status = "ENABLED" if enable_read_tools else "DISABLED"
-        print(f"🔧 Read tools (read_file, read_code_mem): {read_tools_status}")
+    #     # Ask if user wants to continue with actual workflow
+    #     print("\nContinuing with workflow execution...")
 
-        # NOTE: To test without read tools, change the line above to:
-        # enable_read_tools = False
+    #     plan_file = "/Users/lizongwei/Desktop/DeepCode_Project/workbase/DeepCode/deepcode_lab/papers/1/initial_plan.txt"
+    #     # plan_file = "/data2/bjdwhzzh/project-hku/Code-Agent2.0/Code-Agent/deepcode-mcp/agent_folders/papers/1/initial_plan.txt"
+    #     target_directory = "/Users/lizongwei/Desktop/DeepCode_Project/workbase/DeepCode/deepcode_lab/papers/1/"
+    #     print("Implementation Mode Selection:")
+    #     print("1. Pure Code Implementation Mode (Recommended)")
+    #     print("2. Iterative Implementation Mode")
 
-        result = await workflow.run_workflow(
-            plan_file,
-            target_directory=target_directory,
-            pure_code_mode=pure_code_mode,
-            enable_read_tools=enable_read_tools,
-        )
+    #     pure_code_mode = True
+    #     mode_name = "Pure Code Implementation Mode with Memory Agent Architecture + Code Reference Indexer"
+    #     print(f"Using: {mode_name}")
 
-        print("=" * 60)
-        print("Workflow Execution Results:")
-        print(f"Status: {result['status']}")
-        print(f"Mode: {mode_name}")
+    #     # Configure read tools - modify this parameter to enable/disable read tools
+    #     enable_read_tools = (
+    #         True  # Set to False to disable read_file and read_code_mem tools
+    #     )
+    #     read_tools_status = "ENABLED" if enable_read_tools else "DISABLED"
+    #     print(f"🔧 Read tools (read_file, read_code_mem): {read_tools_status}")
 
-        if result["status"] == "success":
-            print(f"Code Directory: {result['code_directory']}")
-            print(f"MCP Architecture: {result.get('mcp_architecture', 'unknown')}")
-            print("Execution completed!")
-        else:
-            print(f"Error Message: {result['message']}")
+    #     # NOTE: To test without read tools, change the line above to:
+    #     # enable_read_tools = False
 
-        print("=" * 60)
-        print(
-            "✅ Using Standard MCP Architecture with Memory Agent + Code Reference Indexer"
-        )
+    #     result = await workflow.run_workflow(
+    #         plan_file,
+    #         target_directory=target_directory,
+    #         pure_code_mode=pure_code_mode,
+    #         enable_read_tools=enable_read_tools,
+    #     )
 
-    else:
-        print("\n" + "=" * 60)
-        print("❌ Code Reference Indexer Integration Test FAILED!")
-        print("Please check the configuration and try again.")
-        print("=" * 60)
+    #     print("=" * 60)
+    #     print("Workflow Execution Results:")
+    #     print(f"Status: {result['status']}")
+    #     print(f"Mode: {mode_name}")
+
+    #     if result["status"] == "success":
+    #         print(f"Code Directory: {result['code_directory']}")
+    #         print(f"MCP Architecture: {result.get('mcp_architecture', 'unknown')}")
+    #         print("Execution completed!")
+    #     else:
+    #         print(f"Error Message: {result['message']}")
+
+    #     print("=" * 60)
+    #     print(
+    #         "✅ Using Standard MCP Architecture with Memory Agent + Code Reference Indexer"
+    #     )
+
+    # else:
+    #     print("\n" + "=" * 60)
+    #     print("❌ Code Reference Indexer Integration Test FAILED!")
+    #     print("Please check the configuration and try again.")
+    #     print("=" * 60)
 
 
 if __name__ == "__main__":

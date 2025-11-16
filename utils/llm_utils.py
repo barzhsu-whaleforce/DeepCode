@@ -53,6 +53,40 @@ def get_preferred_llm_class(config_path: str = "mcp_agent.secrets.yaml") -> Type
         return OpenAIAugmentedLLM
 
 
+def get_token_limits(config_path: str = "mcp_agent.config.yaml") -> Tuple[int, int]:
+    """
+    Get token limits from configuration.
+
+    Args:
+        config_path: Path to the main configuration file
+
+    Returns:
+        tuple: (base_max_tokens, retry_max_tokens)
+    """
+    # Default values that work with qwen/qwen-max (32768 total context)
+    default_base = 20000
+    default_retry = 15000
+    
+    try:
+        if os.path.exists(config_path):
+            with open(config_path, "r", encoding="utf-8") as f:
+                config = yaml.safe_load(f)
+
+            openai_config = config.get("openai", {})
+            base_tokens = openai_config.get("base_max_tokens", default_base)
+            retry_tokens = openai_config.get("retry_max_tokens", default_retry)
+            
+            print(f"⚙️ Token limits from config: base={base_tokens}, retry={retry_tokens}")
+            return base_tokens, retry_tokens
+        else:
+            print(f"⚠️ Config file {config_path} not found, using defaults: base={default_base}, retry={default_retry}")
+            return default_base, default_retry
+    except Exception as e:
+        print(f"⚠️ Error reading token config from {config_path}: {e}")
+        print(f"🔧 Falling back to default token limits: base={default_base}, retry={default_retry}")
+        return default_base, default_retry
+
+
 def get_default_models(config_path: str = "mcp_agent.config.yaml"):
     """
     Get default models from configuration file.
