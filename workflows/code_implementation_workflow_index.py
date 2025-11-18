@@ -299,11 +299,15 @@ Requirements:
         code_agent = CodeImplementationAgent(
             self.mcp_agent, self.logger, self.enable_read_tools
         )
-        
+
         # Pass code_directory to memory agent for file extraction
         code_directory = os.path.join(target_directory, "generate_code")
         memory_agent = ConciseMemoryAgent(
-            plan_content, self.logger, target_directory, self.default_models, code_directory
+            plan_content,
+            self.logger,
+            target_directory,
+            self.default_models,
+            code_directory,
         )
 
         # Log read tools configuration
@@ -424,7 +428,9 @@ Requirements:
             # Check completion based on actual unimplemented files list
             unimplemented_files = memory_agent.get_unimplemented_files()
             if not unimplemented_files:  # Empty list means all files implemented
-                self.logger.info(f"✅ Code implementation complete - All files implemented")
+                self.logger.info(
+                    "✅ Code implementation complete - All files implemented"
+                )
                 break
 
             # Emergency trim if too long
@@ -879,28 +885,27 @@ Requirements:
         return valid_messages
 
     def _prepare_mcp_tool_definitions(self) -> List[Dict[str, Any]]:
-
         """Prepare tool definitions in Anthropic API standard format with filtering"""
         # Get all available tools
         all_tools = get_mcp_tools("code_implementation")
-        
+
         # Define essential tools for code implementation
-        essential_tool_names = {
-            "write_file",
-            "search_code_references"
-        }
-        
+        essential_tool_names = {"write_file", "search_code_references"}
+
         # Filter to only essential tools
         filtered_tools = [
-            tool for tool in all_tools 
-            if tool.get("name") in essential_tool_names
+            tool for tool in all_tools if tool.get("name") in essential_tool_names
         ]
-        
-        self.logger.info(f"🔧 Tool filtering: {len(filtered_tools)}/{len(all_tools)} tools enabled")
-        self.logger.info(f"   Available tools: {[tool.get('name') for tool in filtered_tools]}")
-        
+
+        self.logger.info(
+            f"🔧 Tool filtering: {len(filtered_tools)}/{len(all_tools)} tools enabled"
+        )
+        self.logger.info(
+            f"   Available tools: {[tool.get('name') for tool in filtered_tools]}"
+        )
+
         return filtered_tools
-        
+
         # return get_mcp_tools("code_implementation")
 
     def _check_tool_results_for_errors(self, tool_results: List[Dict]) -> bool:
@@ -1180,9 +1185,7 @@ async def main():
 
         plan_file = "/data2/bjdwhzzh/project-hku/Deepcode_collections/DeepCode/deepcode_lab/papers/54_only_code_gen/initial_plan.txt"
         # plan_file = "/data2/bjdwhzzh/project-hku/Code-Agent2.0/Code-Agent/deepcode-mcp/agent_folders/papers/1/initial_plan.txt"
-        target_directory = (
-            "/data2/bjdwhzzh/project-hku/Deepcode_collections/DeepCode/deepcode_lab/papers/54_only_code_gen/"
-        )
+        target_directory = "/data2/bjdwhzzh/project-hku/Deepcode_collections/DeepCode/deepcode_lab/papers/54_only_code_gen/"
         print("Implementation Mode Selection:")
         print("1. Pure Code Implementation Mode (Recommended)")
         print("2. Iterative Implementation Mode")

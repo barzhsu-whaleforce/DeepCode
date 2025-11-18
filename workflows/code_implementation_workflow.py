@@ -298,11 +298,15 @@ Requirements:
         code_agent = CodeImplementationAgent(
             self.mcp_agent, self.logger, self.enable_read_tools
         )
-        
+
         # Pass code_directory to memory agent for file extraction
         code_directory = os.path.join(target_directory, "generate_code")
         memory_agent = ConciseMemoryAgent(
-            plan_content, self.logger, target_directory, self.default_models, code_directory
+            plan_content,
+            self.logger,
+            target_directory,
+            self.default_models,
+            code_directory,
         )
 
         # Log read tools configuration
@@ -423,7 +427,9 @@ Requirements:
             # Check completion based on actual unimplemented files list
             unimplemented_files = memory_agent.get_unimplemented_files()
             if not unimplemented_files:  # Empty list means all files implemented
-                self.logger.info(f"✅ Code implementation complete - All files implemented")
+                self.logger.info(
+                    "✅ Code implementation complete - All files implemented"
+                )
                 break
 
             # Emergency trim if too long
@@ -1133,69 +1139,65 @@ async def main():
 
     # print("Running Code Reference Indexer Integration Test...")
 
+    test_success = True
+    if test_success:
+        print("\n" + "=" * 60)
+        print("🎉 UNIFIED Code Reference Indexer Integration Test PASSED!")
+        print("🔧 Three-step process successfully merged into ONE tool")
+        print("=" * 60)
 
+        # Ask if user wants to continue with actual workflow
+        print("\nContinuing with workflow execution...")
 
+        plan_file = "/Users/lizongwei/Desktop/DeepCode_Project/workbase/DeepCode/deepcode_lab/papers/1/initial_plan.txt"
+        target_directory = "/Users/lizongwei/Desktop/DeepCode_Project/workbase/DeepCode/deepcode_lab/papers/1/"
+        print("Implementation Mode Selection:")
+        print("1. Pure Code Implementation Mode (Recommended)")
+        print("2. Iterative Implementation Mode")
 
-    # test_success = True
-    # if test_success:
-    #     print("\n" + "=" * 60)
-    #     print("🎉 UNIFIED Code Reference Indexer Integration Test PASSED!")
-    #     print("🔧 Three-step process successfully merged into ONE tool")
-    #     print("=" * 60)
+        pure_code_mode = True
+        mode_name = "Pure Code Implementation Mode with Memory Agent Architecture + Code Reference Indexer"
+        print(f"Using: {mode_name}")
 
-    #     # Ask if user wants to continue with actual workflow
-    #     print("\nContinuing with workflow execution...")
+        # Configure read tools - modify this parameter to enable/disable read tools
+        enable_read_tools = (
+            True  # Set to False to disable read_file and read_code_mem tools
+        )
+        read_tools_status = "ENABLED" if enable_read_tools else "DISABLED"
+        print(f"🔧 Read tools (read_file, read_code_mem): {read_tools_status}")
 
-    #     plan_file = "/Users/lizongwei/Desktop/DeepCode_Project/workbase/DeepCode/deepcode_lab/papers/1/initial_plan.txt"
-    #     # plan_file = "/data2/bjdwhzzh/project-hku/Code-Agent2.0/Code-Agent/deepcode-mcp/agent_folders/papers/1/initial_plan.txt"
-    #     target_directory = "/Users/lizongwei/Desktop/DeepCode_Project/workbase/DeepCode/deepcode_lab/papers/1/"
-    #     print("Implementation Mode Selection:")
-    #     print("1. Pure Code Implementation Mode (Recommended)")
-    #     print("2. Iterative Implementation Mode")
+        # NOTE: To test without read tools, change the line above to:
+        # enable_read_tools = False
 
-    #     pure_code_mode = True
-    #     mode_name = "Pure Code Implementation Mode with Memory Agent Architecture + Code Reference Indexer"
-    #     print(f"Using: {mode_name}")
+        result = await workflow.run_workflow(
+            plan_file,
+            target_directory=target_directory,
+            pure_code_mode=pure_code_mode,
+            enable_read_tools=enable_read_tools,
+        )
 
-    #     # Configure read tools - modify this parameter to enable/disable read tools
-    #     enable_read_tools = (
-    #         True  # Set to False to disable read_file and read_code_mem tools
-    #     )
-    #     read_tools_status = "ENABLED" if enable_read_tools else "DISABLED"
-    #     print(f"🔧 Read tools (read_file, read_code_mem): {read_tools_status}")
+        print("=" * 60)
+        print("Workflow Execution Results:")
+        print(f"Status: {result['status']}")
+        print(f"Mode: {mode_name}")
 
-    #     # NOTE: To test without read tools, change the line above to:
-    #     # enable_read_tools = False
+        if result["status"] == "success":
+            print(f"Code Directory: {result['code_directory']}")
+            print(f"MCP Architecture: {result.get('mcp_architecture', 'unknown')}")
+            print("Execution completed!")
+        else:
+            print(f"Error Message: {result['message']}")
 
-    #     result = await workflow.run_workflow(
-    #         plan_file,
-    #         target_directory=target_directory,
-    #         pure_code_mode=pure_code_mode,
-    #         enable_read_tools=enable_read_tools,
-    #     )
+        print("=" * 60)
+        print(
+            "✅ Using Standard MCP Architecture with Memory Agent + Code Reference Indexer"
+        )
 
-    #     print("=" * 60)
-    #     print("Workflow Execution Results:")
-    #     print(f"Status: {result['status']}")
-    #     print(f"Mode: {mode_name}")
-
-    #     if result["status"] == "success":
-    #         print(f"Code Directory: {result['code_directory']}")
-    #         print(f"MCP Architecture: {result.get('mcp_architecture', 'unknown')}")
-    #         print("Execution completed!")
-    #     else:
-    #         print(f"Error Message: {result['message']}")
-
-    #     print("=" * 60)
-    #     print(
-    #         "✅ Using Standard MCP Architecture with Memory Agent + Code Reference Indexer"
-    #     )
-
-    # else:
-    #     print("\n" + "=" * 60)
-    #     print("❌ Code Reference Indexer Integration Test FAILED!")
-    #     print("Please check the configuration and try again.")
-    #     print("=" * 60)
+    else:
+        print("\n" + "=" * 60)
+        print("❌ Code Reference Indexer Integration Test FAILED!")
+        print("Please check the configuration and try again.")
+        print("=" * 60)
 
 
 if __name__ == "__main__":

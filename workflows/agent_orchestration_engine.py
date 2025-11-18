@@ -30,7 +30,6 @@ import asyncio
 import json
 import os
 import re
-import shutil
 import yaml
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
@@ -168,7 +167,7 @@ def _adjust_params_for_retry(
     """
     # 从配置文件读取retry token limit
     _, retry_max_tokens = get_token_limits(config_path)
-    
+
     # Token减少策略 - 为input腾出更多空间
     if retry_count == 0:
         # 第一次重试：使用配置的retry_max_tokens
@@ -186,7 +185,9 @@ def _adjust_params_for_retry(
     print(f"🔧 Adjusting parameters for retry {retry_count + 1}:")
     print(f"   Token limit: {params.maxTokens} → {new_max_tokens}")
     print(f"   Temperature: {params.temperature:.2f} → {new_temperature:.2f}")
-    print("   💡 Strategy: REDUCE output tokens to fit within model's total context limit")
+    print(
+        "   💡 Strategy: REDUCE output tokens to fit within model's total context limit"
+    )
 
     # return RequestParams(
     #     maxTokens=new_max_tokens,  # 注意：使用 camelCase
@@ -429,7 +430,7 @@ async def run_research_analyzer(prompt_text: str, logger) -> str:
 async def run_resource_processor(analysis_result: str, logger) -> str:
     """
     Run the resource processing workflow - deterministic file operations without LLM.
-    
+
     This function handles file downloading/moving using direct logic rather than LLM,
     since the paper directory structure and ID are pre-computed and deterministic.
 
@@ -443,15 +444,18 @@ async def run_resource_processor(analysis_result: str, logger) -> str:
     # Pre-compute paper ID - deterministic, no LLM needed
     papers_dir = "./deepcode_lab/papers"
     os.makedirs(papers_dir, exist_ok=True)
-    existing_ids = [int(d) for d in os.listdir(papers_dir) 
-                    if os.path.isdir(os.path.join(papers_dir, d)) and d.isdigit()]
+    existing_ids = [
+        int(d)
+        for d in os.listdir(papers_dir)
+        if os.path.isdir(os.path.join(papers_dir, d)) and d.isdigit()
+    ]
     next_id = max(existing_ids) + 1 if existing_ids else 1
     paper_dir = os.path.join(papers_dir, str(next_id))
     os.makedirs(paper_dir, exist_ok=True)
-    
+
     logger.info(f"📋 Paper ID: {next_id}")
     logger.info(f"📂 Paper directory: {paper_dir}")
-    
+
     # Extract file path/URL from analysis_result - simple parsing, no LLM needed
     # The analysis_result should contain the path/URL identified by the analyzer
     try:
@@ -459,31 +463,32 @@ async def run_resource_processor(analysis_result: str, logger) -> str:
         analysis_data = json.loads(analysis_result)
         source_path = analysis_data.get("path") or analysis_data.get("input_path")
         input_type = analysis_data.get("input_type", "unknown")
-        
+
         logger.info(f"📥 Processing {input_type}: {source_path}")
-        
+
         # Try direct function calls first - no LLM needed for deterministic operations
         direct_call_success = False
         operation_result = None
-        
+
         # 1. Handle local file - direct copy
         if input_type == "file" and source_path and os.path.exists(source_path):
             logger.info(f"📄 Direct file copy: {source_path} -> {paper_dir}")
             try:
                 operation_result = await move_file_to(
-                    source=source_path,
-                    destination=paper_dir,
-                    filename=f'{next_id}.pdf'
+                    source=source_path, destination=paper_dir, filename=f"{next_id}.pdf"
                 )
                 # Check if operation succeeded
-                if "[SUCCESS]" in operation_result and "[ERROR]" not in operation_result:
+                if (
+                    "[SUCCESS]" in operation_result
+                    and "[ERROR]" not in operation_result
+                ):
                     direct_call_success = True
                     logger.info(f"✅ Direct file copy succeeded:\n{operation_result}")
                 else:
                     logger.warning(f"⚠️ Direct file copy had issues: {operation_result}")
             except Exception as e:
                 logger.warning(f"⚠️ Direct file copy failed: {e}")
-        
+
         # 2. Handle URL - direct download
         elif input_type == "url" and source_path:
             logger.info(f"🌐 Direct URL download: {source_path} -> {paper_dir}")
@@ -491,47 +496,60 @@ async def run_resource_processor(analysis_result: str, logger) -> str:
                 operation_result = await download_file_to(
                     url=source_path,
                     destination=paper_dir,
-                    filename=f'{next_id}.pdf'  # Default to PDF, conversion will handle it
+                    filename=f"{next_id}.pdf",  # Default to PDF, conversion will handle it
                 )
                 # Check if operation succeeded
-                if "[SUCCESS]" in operation_result and "[ERROR]" not in operation_result:
+                if (
+                    "[SUCCESS]" in operation_result
+                    and "[ERROR]" not in operation_result
+                ):
                     direct_call_success = True
                     logger.info(f"✅ Direct download succeeded:\n{operation_result}")
                 else:
                     logger.warning(f"⚠️ Direct download had issues: {operation_result}")
             except Exception as e:
                 logger.warning(f"⚠️ Direct download failed: {e}")
-        
+
         # 3. If direct call succeeded, format result
         if direct_call_success:
-            dest_path = os.path.join(paper_dir, f'{next_id}.md')
-            result = json.dumps({
-                "status": "success",
-                "paper_id": next_id,
-                "paper_dir": paper_dir,
-                "file_path": dest_path,
-                "message": f"File successfully processed to {paper_dir}",
-                "operation_details": operation_result
-            })
+            dest_path = os.path.join(paper_dir, f"{next_id}.md")
+            result = json.dumps(
+                {
+                    "status": "success",
+                    "paper_id": next_id,
+                    "paper_dir": paper_dir,
+                    "file_path": dest_path,
+                    "message": f"File successfully processed to {paper_dir}",
+                    "operation_details": operation_result,
+                }
+            )
         else:
             # 4. Fallback to LLM agent if direct call failed or unsupported type
-            logger.info(f"🤖 Falling back to LLM agent for: {input_type} - {source_path}")
+            logger.info(
+                f"🤖 Falling back to LLM agent for: {input_type} - {source_path}"
+            )
             processor_agent = Agent(
                 name="ResourceProcessorAgent",
                 instruction=PAPER_DOWNLOADER_PROMPT,
                 server_names=["file-downloader"],
             )
-            
+
             async with processor_agent:
                 processor = await processor_agent.attach_llm(get_preferred_llm_class())
                 processor_params = RequestParams(
                     maxTokens=4096,
                     temperature=0.2,
-                    tool_filter={"file-downloader": {"download_file_to", "move_file_to"}},
+                    tool_filter={
+                        "file-downloader": {"download_file_to", "move_file_to"}
+                    },
                 )
-                
+
                 # Provide context about what failed if available
-                context = f"\nPrevious attempt result: {operation_result}" if operation_result else ""
+                context = (
+                    f"\nPrevious attempt result: {operation_result}"
+                    if operation_result
+                    else ""
+                )
                 message = f"""Download/move the file to paper directory: {paper_dir}
 Source: {source_path}
 Input Type: {input_type}
@@ -539,20 +557,24 @@ Paper ID: {next_id}
 Target filename: {next_id}.md (after conversion){context}
 
 Use the appropriate tool to complete this task."""
-                
-                result = await processor.generate_str(message=message, request_params=processor_params)
-        
+
+                result = await processor.generate_str(
+                    message=message, request_params=processor_params
+                )
+
         return result
-        
+
     except (json.JSONDecodeError, KeyError, Exception) as e:
         logger.error(f"❌ Error processing resource: {e}")
         # Fallback - return paper directory for manual processing
-        return json.dumps({
-            "status": "partial",
-            "paper_id": next_id,
-            "paper_dir": paper_dir,
-            "message": f"Paper directory created at {paper_dir}, manual file placement may be needed"
-        })
+        return json.dumps(
+            {
+                "status": "partial",
+                "paper_id": next_id,
+                "paper_dir": paper_dir,
+                "message": f"Paper directory created at {paper_dir}, manual file placement may be needed",
+            }
+        )
 
 
 async def run_code_analyzer(
@@ -560,7 +582,7 @@ async def run_code_analyzer(
 ) -> str:
     """
     Run the adaptive code analysis workflow with optimized file reading.
-    
+
     This function minimizes LLM tool calls by:
     1. Reading paper file directly (deterministic, no LLM needed)
     2. Passing paper content directly to agents
@@ -582,27 +604,31 @@ async def run_code_analyzer(
     print(
         f"📊 Code analysis mode: {'Segmented' if use_segmentation else 'Traditional'}"
     )
-    print(f"   🔧 Optimized workflow: Direct file reading, LLM only for analysis")
-    
+    print("   🔧 Optimized workflow: Direct file reading, LLM only for analysis")
+
     # STEP 1: Read paper file directly - no LLM needed for deterministic file operations
     paper_content = None
     paper_file_path = None
-    
+
     try:
         # Find .md file in paper directory - simple file system operation
         for filename in os.listdir(paper_dir):
-            if filename.endswith('.md'):
+            if filename.endswith(".md"):
                 paper_file_path = os.path.join(paper_dir, filename)
-                with open(paper_file_path, 'r', encoding='utf-8') as f:
+                with open(paper_file_path, "r", encoding="utf-8") as f:
                     paper_content = f.read()
-                logger.info(f"📄 Paper file loaded: {paper_file_path} ({len(paper_content)} chars)")
+                logger.info(
+                    f"📄 Paper file loaded: {paper_file_path} ({len(paper_content)} chars)"
+                )
                 break
-        
+
         if not paper_content:
-            logger.warning(f"⚠️ No .md file found in {paper_dir}, agents will search for it")
+            logger.warning(
+                f"⚠️ No .md file found in {paper_dir}, agents will search for it"
+            )
     except Exception as e:
         logger.warning(f"⚠️ Error reading paper file: {e}, agents will search for it")
-    
+
     # STEP 2: Configure agents with minimal tool access
     search_server_names = get_search_server_names()
     agent_config = get_adaptive_agent_config(use_segmentation, search_server_names)
@@ -612,7 +638,9 @@ async def run_code_analyzer(
         agent_config = {
             "concept_analysis": [],
             "algorithm_analysis": ["brave"],
-            "code_planner": ["brave"],  # Empty list instead of None - code planner doesn't need tools when paper content is provided
+            "code_planner": [
+                "brave"
+            ],  # Empty list instead of None - code planner doesn't need tools when paper content is provided
         }
         # agent_config = {
         #     "concept_analysis": [],
@@ -625,7 +653,7 @@ async def run_code_analyzer(
             "algorithm_analysis": ["brave", "filesystem"],
             "code_planner": ["brave", "filesystem"],
         }
-    
+
     print(f"   Agent configurations: {agent_config}")
 
     concept_analysis_agent = Agent(
@@ -649,30 +677,33 @@ async def run_code_analyzer(
         fan_out_agents=[concept_analysis_agent, algorithm_analysis_agent],
         llm_factory=get_preferred_llm_class(),
     )
-    
+
     base_max_tokens, _ = get_token_limits()
-    
+
     # STEP 3: Configure parameters - minimal tool filter since paper content is provided
     if use_segmentation:
         max_tokens_limit = base_max_tokens
         temperature = 0.2
         max_iterations = 5
-        print(f"🧠 Using SEGMENTED mode: max_tokens={base_max_tokens} for complete YAML output")
-        
+        print(
+            f"🧠 Using SEGMENTED mode: max_tokens={base_max_tokens} for complete YAML output"
+        )
+
         # Segmentation mode: Only use segmentation tools if needed (paper content already provided)
         tool_filter = {
-            "document-segmentation": {
-                "read_document_segments",
-                "get_document_overview"
-            } if not paper_content else set(),  # Empty if paper already loaded
+            "document-segmentation": {"read_document_segments", "get_document_overview"}
+            if not paper_content
+            else set(),  # Empty if paper already loaded
             # "brave" not in filter = all brave tools available for searching
         }
     else:
         max_tokens_limit = base_max_tokens
         temperature = 0.3
         max_iterations = 2
-        print(f"🧠 Using TRADITIONAL mode: max_tokens={base_max_tokens} for complete YAML output")
-        
+        print(
+            f"🧠 Using TRADITIONAL mode: max_tokens={base_max_tokens} for complete YAML output"
+        )
+
         # Traditional mode: No filesystem tools needed (paper content already provided)
         if paper_content:
             tool_filter = {
@@ -690,7 +721,9 @@ async def run_code_analyzer(
         maxTokens=max_tokens_limit,
         temperature=temperature,
         max_iterations=max_iterations,
-        tool_filter=tool_filter if tool_filter else None,  # None = all tools, empty dict = no filtering
+        tool_filter=tool_filter
+        if tool_filter
+        else None,  # None = all tools, empty dict = no filtering
     )
 
     # STEP 4: Construct message with paper content directly included
@@ -737,7 +770,9 @@ The goal is to create a reproduction plan detailed enough for independent implem
 
             print(f"🔍 Code analysis result:\n{result}")
 
-            completeness_score = _assess_output_completeness(result) # need to add file structure val
+            completeness_score = _assess_output_completeness(
+                result
+            )  # need to add file structure val
             print(f"📊 Output completeness score: {completeness_score:.2f}/1.0")
 
             if completeness_score >= 0.8:
@@ -749,12 +784,16 @@ The goal is to create a reproduction plan detailed enough for independent implem
                 print(
                     f"⚠️ Output appears truncated (score: {completeness_score:.2f}), retrying with enhanced parameters..."
                 )
-                new_max_tokens, new_temperature = _adjust_params_for_retry(enhanced_params, retry_count)
+                new_max_tokens, new_temperature = _adjust_params_for_retry(
+                    enhanced_params, retry_count
+                )
                 enhanced_params = RequestParams(
                     maxTokens=new_max_tokens,
                     temperature=new_temperature,
                     max_iterations=max_iterations,
-                    tool_filter=tool_filter if tool_filter else None,  # None = all tools, empty dict = no filtering
+                    tool_filter=tool_filter
+                    if tool_filter
+                    else None,  # None = all tools, empty dict = no filtering
                 )
                 retry_count += 1
 
@@ -836,7 +875,7 @@ Goal: Find the most valuable GitHub repositories from the paper's reference list
             tool_filter={
                 "filesystem": {"read_text_file", "list_directory"},
                 "fetch": {"fetch"},
-            }
+            },
         )
 
         reference_result = await analyzer.generate_str(

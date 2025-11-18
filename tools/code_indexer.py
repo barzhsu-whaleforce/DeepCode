@@ -24,7 +24,6 @@ from dataclasses import dataclass, asdict
 from typing import List, Dict, Any
 
 # MCP Agent imports for LLM
-import yaml
 from utils.llm_utils import get_preferred_llm_class, get_default_models
 
 
