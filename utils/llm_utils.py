@@ -12,40 +12,77 @@ from typing import Any, Type, Dict, Tuple
 # Import LLM classes
 from mcp_agent.workflows.llm.augmented_llm_anthropic import AnthropicAugmentedLLM
 from mcp_agent.workflows.llm.augmented_llm_openai import OpenAIAugmentedLLM
+from mcp_agent.workflows.llm.augmented_llm_google import GoogleAugmentedLLM
 
 
 def get_preferred_llm_class(config_path: str = "mcp_agent.secrets.yaml") -> Type[Any]:
     """
-    Automatically select the LLM class based on API key availability in configuration.
+    Select the LLM class based on user preference and API key availability.
 
-    Reads from YAML config file and returns AnthropicAugmentedLLM if anthropic.api_key
-    is available, otherwise returns OpenAIAugmentedLLM.
+    Priority:
+    1. Check mcp_agent.config.yaml for llm_provider preference
+    2. Verify the preferred provider has API key
+    3. Fallback to first available provider
 
     Args:
-        config_path: Path to the YAML configuration file
+        config_path: Path to the secrets YAML configuration file
 
     Returns:
         class: The preferred LLM class
     """
     try:
-        # Try to read the configuration file
-        if os.path.exists(config_path):
-            with open(config_path, "r", encoding="utf-8") as f:
-                config = yaml.safe_load(f)
-
-            # Check for anthropic API key in config
-            anthropic_config = config.get("anthropic", {})
-            anthropic_key = anthropic_config.get("api_key", "")
-
-            if anthropic_key and anthropic_key.strip() and not anthropic_key == "":
-                # print("🤖 Using AnthropicAugmentedLLM (Anthropic API key found in config)")
-                return AnthropicAugmentedLLM
-            else:
-                # print("🤖 Using OpenAIAugmentedLLM (Anthropic API key not configured)")
-                return OpenAIAugmentedLLM
-        else:
+        # Read API keys from secrets file
+        if not os.path.exists(config_path):
             print(f"🤖 Config file {config_path} not found, using OpenAIAugmentedLLM")
             return OpenAIAugmentedLLM
+
+        with open(config_path, "r", encoding="utf-8") as f:
+            secrets = yaml.safe_load(f)
+
+        # Get API keys
+        anthropic_key = secrets.get("anthropic", {}).get("api_key", "").strip()
+        google_key = secrets.get("google", {}).get("api_key", "").strip()
+        openai_key = secrets.get("openai", {}).get("api_key", "").strip()
+
+        # Read user preference from main config
+        main_config_path = "mcp_agent.config.yaml"
+        preferred_provider = None
+        if os.path.exists(main_config_path):
+            with open(main_config_path, "r", encoding="utf-8") as f:
+                main_config = yaml.safe_load(f)
+                preferred_provider = main_config.get("llm_provider", "").strip().lower()
+
+        # Map of providers to their classes and keys
+        provider_map = {
+            "anthropic": (
+                AnthropicAugmentedLLM,
+                anthropic_key,
+                "AnthropicAugmentedLLM",
+            ),
+            "google": (GoogleAugmentedLLM, google_key, "GoogleAugmentedLLM"),
+            "openai": (OpenAIAugmentedLLM, openai_key, "OpenAIAugmentedLLM"),
+        }
+
+        # Try user's preferred provider first
+        if preferred_provider and preferred_provider in provider_map:
+            llm_class, api_key, class_name = provider_map[preferred_provider]
+            if api_key:
+                print(f"🤖 Using {class_name} (user preference: {preferred_provider})")
+                return llm_class
+            else:
+                print(
+                    f"⚠️ Preferred provider '{preferred_provider}' has no API key, checking alternatives..."
+                )
+
+        # Fallback: try providers in order of availability
+        for provider, (llm_class, api_key, class_name) in provider_map.items():
+            if api_key:
+                print(f"🤖 Using {class_name} ({provider} API key found)")
+                return llm_class
+
+        # No API keys found
+        print("⚠️ No API keys configured, falling back to OpenAIAugmentedLLM")
+        return OpenAIAugmentedLLM
 
     except Exception as e:
         print(f"🤖 Error reading config file {config_path}: {e}")
@@ -101,7 +138,7 @@ def get_default_models(config_path: str = "mcp_agent.config.yaml"):
         config_path: Path to the configuration file
 
     Returns:
-        dict: Dictionary with 'anthropic' and 'openai' default models
+        dict: Dictionary with 'anthropic', 'openai', and 'google' default models
     """
     try:
         if os.path.exists(config_path):
@@ -111,20 +148,34 @@ def get_default_models(config_path: str = "mcp_agent.config.yaml"):
             # Handle null values in config sections
             anthropic_config = config.get("anthropic") or {}
             openai_config = config.get("openai") or {}
+            google_config = config.get("google") or {}
 
             anthropic_model = anthropic_config.get(
                 "default_model", "claude-sonnet-4-20250514"
             )
             openai_model = openai_config.get("default_model", "o3-mini")
+            google_model = google_config.get("default_model", "gemini-2.0-flash")
 
-            return {"anthropic": anthropic_model, "openai": openai_model}
+            return {
+                "anthropic": anthropic_model,
+                "openai": openai_model,
+                "google": google_model,
+            }
         else:
             print(f"Config file {config_path} not found, using default models")
-            return {"anthropic": "claude-sonnet-4-20250514", "openai": "o3-mini"}
+            return {
+                "anthropic": "claude-sonnet-4-20250514",
+                "openai": "o3-mini",
+                "google": "gemini-2.0-flash",
+            }
 
     except Exception as e:
         print(f"❌Error reading config file {config_path}: {e}")
-        return {"anthropic": "claude-sonnet-4-20250514", "openai": "o3-mini"}
+        return {
+            "anthropic": "claude-sonnet-4-20250514",
+            "openai": "o3-mini",
+            "google": "gemini-2.0-flash",
+        }
 
 
 def get_document_segmentation_config(

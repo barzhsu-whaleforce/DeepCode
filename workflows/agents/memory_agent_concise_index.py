@@ -63,8 +63,9 @@ class ConciseMemoryAgent:
 
         # Store default models configuration
         self.default_models = default_models or {
-            "anthropic": "anthropic/claude-sonnet-4.5",
-            "openai": "openai/gpt-4o",
+            "anthropic": "claude-sonnet-4-20250514",
+            "openai": "o3-mini",
+            "google": "gemini-2.0-flash",
         }
 
         # Memory state tracking - new logic: trigger after each write_file
@@ -1421,6 +1422,54 @@ class ConciseMemoryAgent:
             else:
                 self.logger.warning("OpenAI response is empty or malformed")
                 return {"content": ""}
+
+        elif client_type == "google":
+            from google.genai import types
+
+            # Convert messages to Gemini format
+            system_instruction = "You are an expert code implementation summarizer. Create structured summaries of implemented code files that preserve essential information about functions, dependencies, and implementation approaches."
+
+            gemini_messages = []
+            for msg in summary_messages:
+                role = msg.get("role", "user")
+                content = msg.get("content", "")
+
+                # Convert role names: "assistant" -> "model"
+                if role == "assistant":
+                    role = "model"
+                elif role not in ["user", "model"]:
+                    role = "user"
+
+                gemini_messages.append(
+                    types.Content(role=role, parts=[types.Part.from_text(text=content)])
+                )
+
+            config = types.GenerateContentConfig(
+                max_output_tokens=5000,
+                temperature=0.2,
+                system_instruction=system_instruction,
+            )
+
+            response = await client.aio.models.generate_content(
+                model=self.default_models.get("google", "gemini-2.0-flash"),
+                contents=gemini_messages,
+                config=config,
+            )
+
+            # Extract content from Gemini response
+            content = ""
+            if response and hasattr(response, "candidates") and response.candidates:
+                candidate = response.candidates[0]
+                if hasattr(candidate, "content") and candidate.content:
+                    if hasattr(candidate.content, "parts") and candidate.content.parts:
+                        for part in candidate.content.parts:
+                            if hasattr(part, "text") and part.text:
+                                content += part.text
+
+            if not content:
+                self.logger.warning("Google response is empty or malformed")
+
+            return {"content": content}
 
         else:
             raise ValueError(f"Unsupported client type: {client_type}")

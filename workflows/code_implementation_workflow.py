@@ -200,7 +200,19 @@ Requirements:
 - Execute commands to actually create the file structure"""
 
             result = await creator.generate_str(message=message)
-            self.logger.info("File tree structure creation completed")
+            self.logger.info(f"LLM response: {result[:200]}...")  # Log first 200 chars
+
+            # Verify directory was created, if not create it manually
+            code_dir = os.path.join(target_directory, "generate_code")
+            if not os.path.exists(code_dir):
+                self.logger.warning(
+                    "LLM did not create directory, creating manually..."
+                )
+                os.makedirs(code_dir, exist_ok=True)
+                self.logger.info(f"✅ Manually created directory: {code_dir}")
+            else:
+                self.logger.info(f"✅ Directory exists: {code_dir}")
+
             return result
 
     async def implement_code_pure(
@@ -216,9 +228,11 @@ Requirements:
         self.logger.info(f"🎯 Using code directory (MCP workspace): {code_directory}")
 
         if not os.path.exists(code_directory):
-            raise FileNotFoundError(
-                "File tree structure not found, please run file tree creation first"
+            self.logger.warning(
+                f"Code directory does not exist, creating it: {code_directory}"
             )
+            os.makedirs(code_directory, exist_ok=True)
+            self.logger.info(f"✅ Code directory created: {code_directory}")
 
         try:
             client, client_type = await self._initialize_llm_client()
@@ -494,18 +508,33 @@ Requirements:
                 self.mcp_agent = None
 
     async def _initialize_llm_client(self):
-        """Initialize LLM client (Anthropic or OpenAI) based on API key availability"""
-        # Check which API has available key and try that first
+        """Initialize LLM client based on llm_provider preference and API key availability"""
+        # Get API keys
         anthropic_key = self.api_config.get("anthropic", {}).get("api_key", "")
         openai_key = self.api_config.get("openai", {}).get("api_key", "")
+        google_key = self.api_config.get("google", {}).get("api_key", "")
 
-        # Try Anthropic API first if key is available
-        if anthropic_key and anthropic_key.strip():
+        # Read user preference from main config
+        preferred_provider = None
+        try:
+            import yaml
+
+            config_path = "mcp_agent.config.yaml"
+            if os.path.exists(config_path):
+                with open(config_path, "r", encoding="utf-8") as f:
+                    config = yaml.safe_load(f)
+                    preferred_provider = config.get("llm_provider", "").strip().lower()
+        except Exception as e:
+            self.logger.warning(f"Could not read llm_provider preference: {e}")
+
+        # Define provider initialization functions
+        async def init_anthropic():
+            if not (anthropic_key and anthropic_key.strip()):
+                return None
             try:
                 from anthropic import AsyncAnthropic
 
                 client = AsyncAnthropic(api_key=anthropic_key)
-                # Test connection with default model from config
                 await client.messages.create(
                     model=self.default_models["anthropic"],
                     max_tokens=20,
@@ -517,13 +546,42 @@ Requirements:
                 return client, "anthropic"
             except Exception as e:
                 self.logger.warning(f"Anthropic API unavailable: {e}")
+                return None
 
-        # Try OpenAI API if Anthropic failed or key not available
-        if openai_key and openai_key.strip():
+        async def init_google():
+            if not (google_key and google_key.strip()):
+                return None
+            try:
+                from google import genai
+
+                client = genai.Client(api_key=google_key)
+                try:
+                    test_response = await client.aio.models.generate_content(
+                        model=self.default_models.get("google", "gemini-2.0-flash"),
+                        contents="test",
+                    )
+                    self.logger.info(
+                        "Google API connection successful: " + str(test_response)
+                    )
+                except Exception as test_err:
+                    self.logger.warning(
+                        f"Could not test Google API: {test_err}, but will try to use client"
+                    )
+
+                self.logger.info(
+                    f"Using Google API with model: {self.default_models.get('google', 'gemini-2.0-flash')}"
+                )
+                return client, "google"
+            except Exception as e:
+                self.logger.warning(f"Google API unavailable: {e}")
+                return None
+
+        async def init_openai():
+            if not (openai_key and openai_key.strip()):
+                return None
             try:
                 from openai import AsyncOpenAI
 
-                # Handle custom base_url if specified
                 openai_config = self.api_config.get("openai", {})
                 base_url = openai_config.get("base_url")
 
@@ -532,11 +590,8 @@ Requirements:
                 else:
                     client = AsyncOpenAI(api_key=openai_key)
 
-                # Get model name from config
                 model_name = self.default_models.get("openai", "o3-mini")
 
-                # Test connection with default model from config
-                # Try max_tokens first, fallback to max_completion_tokens if unsupported
                 try:
                     await client.chat.completions.create(
                         model=model_name,
@@ -545,7 +600,6 @@ Requirements:
                     )
                 except Exception as e:
                     if "max_tokens" in str(e) and "max_completion_tokens" in str(e):
-                        # Retry with max_completion_tokens for models that require it
                         self.logger.info(
                             f"Model {model_name} requires max_completion_tokens parameter"
                         )
@@ -562,6 +616,33 @@ Requirements:
                 return client, "openai"
             except Exception as e:
                 self.logger.warning(f"OpenAI API unavailable: {e}")
+                return None
+
+        # Map providers to their init functions
+        provider_init_map = {
+            "anthropic": init_anthropic,
+            "google": init_google,
+            "openai": init_openai,
+        }
+
+        # Try preferred provider first
+        if preferred_provider and preferred_provider in provider_init_map:
+            self.logger.info(f"🎯 Trying preferred provider: {preferred_provider}")
+            result = await provider_init_map[preferred_provider]()
+            if result:
+                return result
+            else:
+                self.logger.warning(
+                    f"⚠️ Preferred provider '{preferred_provider}' unavailable, trying alternatives..."
+                )
+
+        # Fallback: try providers in order
+        for provider_name, init_func in provider_init_map.items():
+            if provider_name == preferred_provider:
+                continue  # Already tried
+            result = await init_func()
+            if result:
+                return result
 
         raise ValueError(
             "No available LLM API - please check your API keys in configuration"
@@ -578,6 +659,10 @@ Requirements:
                 )
             elif client_type == "openai":
                 return await self._call_openai_with_tools(
+                    client, system_message, messages, tools, max_tokens
+                )
+            elif client_type == "google":
+                return await self._call_google_with_tools(
                     client, system_message, messages, tools, max_tokens
                 )
             else:
@@ -621,6 +706,196 @@ Requirements:
                 )
 
         return {"content": content, "tool_calls": tool_calls}
+
+    async def _call_google_with_tools(
+        self, client, system_message, messages, tools, max_tokens
+    ):
+        """
+        Call Google Gemini API with tools
+
+        Note: Google Gemini uses a completely different API structure.
+        The client here is expected to be google.genai.Client from google-genai SDK.
+
+        Reference: https://ai.google.dev/gemini-api/docs/function-calling
+        """
+        try:
+            from google.genai import types
+        except ImportError:
+            raise ImportError("google-genai package is required for Google API calls")
+
+        validated_messages = self._validate_messages(messages)
+        if not validated_messages:
+            validated_messages = [
+                {"role": "user", "content": "Please continue implementing code"}
+            ]
+
+        # Convert messages to Google Gemini format (types.Content)
+        # Gemini expects: role="user" or role="model" (not "assistant")
+        gemini_messages = []
+        for msg in validated_messages:
+            role = msg.get("role", "user")
+            content = msg.get("content", "")
+
+            # Convert role names: "assistant" -> "model"
+            if role == "assistant":
+                role = "model"
+            elif role not in ["user", "model"]:
+                # Skip unsupported roles or convert to user
+                role = "user"
+
+            gemini_messages.append(
+                types.Content(role=role, parts=[types.Part.from_text(text=content)])
+            )
+
+        # Convert tools to Google Gemini format (types.Tool with FunctionDeclaration)
+        # Following the EXACT pattern from GoogleAugmentedLLM line 92-103
+        # IMPORTANT: Each tool should be wrapped in its own Tool object!
+        gemini_tools = []
+        if tools:
+            for tool in tools:
+                # Transform the input_schema to be Gemini-compatible
+                parameters = self._transform_schema_for_gemini(tool["input_schema"])
+
+                # Each tool gets its own Tool wrapper (not all in one!)
+                gemini_tools.append(
+                    types.Tool(
+                        function_declarations=[
+                            types.FunctionDeclaration(
+                                name=tool["name"],
+                                description=tool["description"],
+                                parameters=parameters,
+                            )
+                        ]
+                    )
+                )
+
+        # Create config with system instruction and tools
+        config = types.GenerateContentConfig(
+            max_output_tokens=max_tokens,
+            temperature=0.2,
+            system_instruction=system_message if system_message else None,
+            tools=gemini_tools if gemini_tools else None,
+            # Disable automatic function calling - we handle it manually
+            automatic_function_calling=types.AutomaticFunctionCallingConfig(
+                disable=True
+            ),
+        )
+
+        try:
+            # Google Gemini API call using the native SDK
+            # client is google.genai.Client instance
+            response = await client.aio.models.generate_content(
+                model=self.default_models["google"],
+                contents=gemini_messages,
+                config=config,
+            )
+        except Exception as e:
+            self.logger.error(f"Google API call failed: {e}")
+            raise
+
+        # Parse Gemini response (types.GenerateContentResponse)
+        # Following the pattern from augmented_llm_google.py lines 145-165
+        content = ""
+        tool_calls = []
+
+        if response and hasattr(response, "candidates") and response.candidates:
+            candidate = response.candidates[0]
+
+            if hasattr(candidate, "content") and candidate.content:
+                if hasattr(candidate.content, "parts") and candidate.content.parts:
+                    for part in candidate.content.parts:
+                        # Handle text content
+                        if hasattr(part, "text") and part.text:
+                            content += part.text
+
+                        # Handle function calls
+                        # Check for function_call attribute, matching augmented_llm_google.py line 164
+                        if hasattr(part, "function_call") and part.function_call:
+                            fc = part.function_call
+                            # Extract function call details
+                            # Note: Gemini function_call has name and args attributes
+                            tool_call = {
+                                "id": getattr(
+                                    fc, "id", getattr(fc, "name", "")
+                                ),  # Use name as fallback for id
+                                "name": fc.name if hasattr(fc, "name") else "",
+                                "input": dict(fc.args)
+                                if hasattr(fc, "args") and fc.args
+                                else {},
+                            }
+                            self.logger.debug(
+                                f"Google function_call parsed: {tool_call}"
+                            )
+                            tool_calls.append(tool_call)
+
+        return {"content": content, "tool_calls": tool_calls}
+
+    def _transform_schema_for_gemini(self, schema: dict) -> dict:
+        """
+        Transform JSON Schema to OpenAPI Schema format compatible with Gemini.
+
+        This is based on the transform_mcp_tool_schema from GoogleAugmentedLLM.
+        Key transformations:
+        1. Convert camelCase to snake_case
+        2. Remove unsupported fields (default, additionalProperties)
+        3. Handle nullable types via anyOf
+        """
+        if not isinstance(schema, dict):
+            return schema
+
+        # Fields to exclude
+        EXCLUDED_PROPERTIES = {"default", "additionalProperties"}
+
+        # camelCase to snake_case mappings
+        CAMEL_TO_SNAKE = {
+            "anyOf": "any_of",
+            "maxLength": "max_length",
+            "minLength": "min_length",
+            "minProperties": "min_properties",
+            "maxProperties": "max_properties",
+            "maxItems": "max_items",
+            "minItems": "min_items",
+        }
+
+        result = {}
+
+        for key, value in schema.items():
+            # Skip excluded properties
+            if key in EXCLUDED_PROPERTIES:
+                continue
+
+            # Convert camelCase to snake_case
+            snake_key = CAMEL_TO_SNAKE.get(key, key)
+
+            # Handle nested structures
+            if key == "properties" and isinstance(value, dict):
+                result[snake_key] = {
+                    prop_k: self._transform_schema_for_gemini(prop_v)
+                    for prop_k, prop_v in value.items()
+                }
+            elif key == "items" and isinstance(value, dict):
+                result[snake_key] = self._transform_schema_for_gemini(value)
+            elif key == "anyOf" and isinstance(value, list):
+                # Handle nullable types (Type | None)
+                has_null = any(
+                    isinstance(item, dict) and item.get("type") == "null"
+                    for item in value
+                )
+                if has_null:
+                    result["nullable"] = True
+
+                # Get first non-null schema
+                for item in value:
+                    if isinstance(item, dict) and item.get("type") != "null":
+                        transformed = self._transform_schema_for_gemini(item)
+                        for k, v in transformed.items():
+                            if k not in result:
+                                result[k] = v
+                        break
+            else:
+                result[snake_key] = value
+
+        return result
 
     def _repair_truncated_json(self, json_str: str, tool_name: str = "") -> dict:
         """
@@ -1149,8 +1424,8 @@ async def main():
         # Ask if user wants to continue with actual workflow
         print("\nContinuing with workflow execution...")
 
-        plan_file = "/Users/lizongwei/Desktop/DeepCode_Project/workbase/DeepCode/deepcode_lab/papers/1/initial_plan.txt"
-        target_directory = "/Users/lizongwei/Desktop/DeepCode_Project/workbase/DeepCode/deepcode_lab/papers/1/"
+        plan_file = "/Users/lizongwei/Desktop/DeepCode_Project/workbase/DeepCode/deepcode_lab/papers/2/initial_plan.txt"
+        target_directory = "/Users/lizongwei/Desktop/DeepCode_Project/workbase/DeepCode/deepcode_lab/papers/2/"
         print("Implementation Mode Selection:")
         print("1. Pure Code Implementation Mode (Recommended)")
         print("2. Iterative Implementation Mode")
