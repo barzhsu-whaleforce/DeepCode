@@ -29,12 +29,14 @@ def log_sidebar_event(
     try:
         # Check if we're in a Streamlit context
         from streamlit.runtime.scriptrunner import get_script_run_ctx
+
         if get_script_run_ctx() is None:
             # Running in background thread, just use Python logging
             import logging
+
             logging.info(f"[{stage}] {message}")
             return
-        
+
         _init_event_store()
         events = list(st.session_state.sidebar_events)
         events.append(
@@ -50,6 +52,7 @@ def log_sidebar_event(
     except Exception:
         # Fallback to Python logging
         import logging
+
         logging.info(f"[{stage}] {message}")
 
 
@@ -86,4 +89,3 @@ def ensure_sidebar_logging():
 
     logging.getLogger().addHandler(handler)
     st.session_state._sidebar_logging_attached = True
-
