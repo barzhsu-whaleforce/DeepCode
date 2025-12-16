@@ -57,6 +57,8 @@ from utils.llm_utils import (
     get_adaptive_agent_config,
     get_adaptive_prompts,
     get_token_limits,
+    get_model_for_task,
+    get_llm_class_for_task,
 )
 from workflows.agents.document_segmentation_agent import prepare_document_segments
 from workflows.agents.requirement_analysis_agent import RequirementAnalysisAgent
@@ -411,7 +413,9 @@ async def run_research_analyzer(prompt_text: str, logger) -> str:
                 print(f"Failed to list tools: {e}")
 
             try:
-                analyzer = await analyzer_agent.attach_llm(get_preferred_llm_class())
+                # Use task-specific model for research analysis (simple tier)
+                task_config = get_model_for_task("research_analyzer")
+                analyzer = await analyzer_agent.attach_llm(task_config["llm_class"])
                 print("✅ LLM attached successfully")
             except Exception as e:
                 print(f"❌ Failed to attach LLM: {e}")
@@ -419,6 +423,7 @@ async def run_research_analyzer(prompt_text: str, logger) -> str:
 
             # Set higher token output for research analysis
             analysis_params = RequestParams(
+                model=task_config["model"],  # Use task-specific model
                 maxTokens=6144,  # 使用 camelCase
                 temperature=0.3,
             )
@@ -590,8 +595,11 @@ async def run_resource_processor(analysis_result: str, logger) -> str:
             )
 
             async with processor_agent:
-                processor = await processor_agent.attach_llm(get_preferred_llm_class())
+                # Use task-specific model for resource processing (simple tier)
+                task_config = get_model_for_task("resource_processor")
+                processor = await processor_agent.attach_llm(task_config["llm_class"])
                 processor_params = RequestParams(
+                    model=task_config["model"],  # Use task-specific model
                     maxTokens=4096,
                     temperature=0.2,
                     tool_filter={
@@ -730,10 +738,14 @@ async def run_code_analyzer(
         server_names=agent_config["code_planner"],
     )
 
+    # Get task-specific model config for code planning (complex tier)
+    # ParallelLLM shares the same model across all agents in the pipeline
+    code_planning_config = get_model_for_task("code_planning")
+
     code_aggregator_agent = ParallelLLM(
         fan_in_agent=code_planner_agent,
         fan_out_agents=[concept_analysis_agent, algorithm_analysis_agent],
-        llm_factory=get_preferred_llm_class(),
+        llm_factory=code_planning_config["llm_class"],
     )
 
     base_max_tokens, _ = get_token_limits()
@@ -776,6 +788,7 @@ async def run_code_analyzer(
             }
 
     enhanced_params = RequestParams(
+        model=code_planning_config["model"],  # Use task-specific model
         maxTokens=max_tokens_limit,
         temperature=temperature,
         max_iterations=max_iterations,
@@ -846,6 +859,7 @@ The goal is to create a reproduction plan detailed enough for independent implem
                     enhanced_params, retry_count
                 )
                 enhanced_params = RequestParams(
+                    model=code_planning_config["model"],  # Maintain task-specific model
                     maxTokens=new_max_tokens,
                     temperature=new_temperature,
                     max_iterations=max_iterations,
@@ -887,10 +901,13 @@ async def github_repo_download(search_result: str, paper_dir: str, logger) -> st
 
     async with github_download_agent:
         print("GitHub downloader: Downloading repositories...")
-        downloader = await github_download_agent.attach_llm(get_preferred_llm_class())
+        # Use task-specific model for GitHub download (simple tier)
+        task_config = get_model_for_task("github_download")
+        downloader = await github_download_agent.attach_llm(task_config["llm_class"])
 
         # Set higher token output for GitHub download
         github_params = RequestParams(
+            model=task_config["model"],  # Use task-specific model
             maxTokens=4096,  # 使用 camelCase
             temperature=0.1,
         )
@@ -924,10 +941,13 @@ Goal: Find the most valuable GitHub repositories from the paper's reference list
 
     async with reference_analysis_agent:
         print("Reference analyzer: Connected to server, analyzing references...")
-        analyzer = await reference_analysis_agent.attach_llm(get_preferred_llm_class())
+        # Use task-specific model for reference analysis (medium tier)
+        task_config = get_model_for_task("reference_analysis")
+        analyzer = await reference_analysis_agent.attach_llm(task_config["llm_class"])
 
         # Filter tools to only essential ones for reference analysis
         reference_params = RequestParams(
+            model=task_config["model"],  # Use task-specific model
             maxTokens=4096,
             temperature=0.2,
             tool_filter={
@@ -1586,9 +1606,9 @@ async def run_chat_planning_agent(user_input: str, logger) -> str:
                 print(f"Failed to list tools: {e}")
 
             try:
-                planner = await chat_planning_agent.attach_llm(
-                    get_preferred_llm_class()
-                )
+                # Use task-specific model for chat planning (complex tier)
+                task_config = get_model_for_task("chat_planning")
+                planner = await chat_planning_agent.attach_llm(task_config["llm_class"])
                 print("✅ LLM attached successfully")
             except Exception as e:
                 print(f"❌ Failed to attach LLM: {e}")
@@ -1596,6 +1616,7 @@ async def run_chat_planning_agent(user_input: str, logger) -> str:
 
             # Set higher token output for comprehensive planning
             planning_params = RequestParams(
+                model=task_config["model"],  # Use task-specific model
                 maxTokens=8192,  # 使用 camelCase - Higher token limit for detailed plans
                 temperature=0.2,  # Lower temperature for more structured output
             )

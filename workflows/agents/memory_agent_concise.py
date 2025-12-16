@@ -23,6 +23,8 @@ import time
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 
+from utils.llm_utils import get_model_for_task
+
 
 class ConciseMemoryAgent:
     """
@@ -1368,10 +1370,18 @@ class ConciseMemoryAgent:
 
         This method is used only for creating code implementation summaries,
         NOT for conversation summarization which has been removed.
+
+        Uses task-specific model from memory_summary configuration for cost optimization.
         """
+        # Get task-specific model configuration for memory summary (summary tier - fast & free)
+        summary_config = get_model_for_task("memory_summary")
+        summary_model = summary_config.get("model")
+
         if client_type == "anthropic":
+            # Use configured model or fallback to default
+            model = summary_model if summary_config.get("provider") == "anthropic" else self.default_models["anthropic"]
             response = await client.messages.create(
-                model=self.default_models["anthropic"],
+                model=model,
                 system="You are an expert code implementation summarizer. Create structured summaries of implemented code files that preserve essential information about functions, dependencies, and implementation approaches.",
                 messages=summary_messages,
                 max_tokens=5000,
@@ -1397,10 +1407,13 @@ class ConciseMemoryAgent:
             ]
             openai_messages.extend(summary_messages)
 
+            # Use configured model or fallback to default
+            model = summary_model if summary_config.get("provider") == "openai" else self.default_models["openai"]
+
             # Try max_tokens and temperature first, fallback to max_completion_tokens without temperature if unsupported
             try:
                 response = await client.chat.completions.create(
-                    model=self.default_models["openai"],
+                    model=model,
                     messages=openai_messages,
                     max_tokens=5000,
                     temperature=0.2,
@@ -1409,7 +1422,7 @@ class ConciseMemoryAgent:
                 if "max_tokens" in str(e) and "max_completion_tokens" in str(e):
                     # Retry with max_completion_tokens and no temperature for models that require it
                     response = await client.chat.completions.create(
-                        model=self.default_models["openai"],
+                        model=model,
                         messages=openai_messages,
                         max_completion_tokens=5000,
                     )
@@ -1450,8 +1463,11 @@ class ConciseMemoryAgent:
                 system_instruction=system_instruction,
             )
 
+            # Use configured model or fallback to default (memory_summary is configured for google/gemini-2.0-flash)
+            model = summary_model if summary_config.get("provider") == "google" else self.default_models.get("google", "gemini-2.0-flash")
+
             response = await client.aio.models.generate_content(
-                model=self.default_models.get("google", "gemini-2.0-flash"),
+                model=model,
                 contents=gemini_messages,
                 config=config,
             )

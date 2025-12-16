@@ -87,7 +87,7 @@ from prompts.code_prompts import (
 from workflows.agents import CodeImplementationAgent
 from workflows.agents.memory_agent_concise import ConciseMemoryAgent
 from config.mcp_tool_definitions import get_mcp_tools
-from utils.llm_utils import get_preferred_llm_class, get_default_models
+from utils.llm_utils import get_preferred_llm_class, get_default_models, get_model_for_task
 # DialogueLogger removed - no longer needed
 
 
@@ -230,9 +230,9 @@ class CodeImplementationWorkflow:
         )
 
         async with structure_agent:
-            creator = await structure_agent.attach_llm(
-                get_preferred_llm_class(self.config_path)
-            )
+            # Use task-specific model for structure generation (simple tier)
+            task_config = get_model_for_task("structure_generator")
+            creator = await structure_agent.attach_llm(task_config["llm_class"])
 
             message = f"""Analyze the following implementation plan and generate shell commands to create the file tree structure.
 
@@ -528,9 +528,9 @@ Requirements:
             )
 
             await self.mcp_agent.__aenter__()
-            llm = await self.mcp_agent.attach_llm(
-                get_preferred_llm_class(self.config_path)
-            )
+            # Use task-specific model for code implementation (complex tier)
+            task_config = get_model_for_task("code_implementation")
+            llm = await self.mcp_agent.attach_llm(task_config["llm_class"])
 
             # Set workspace to the target code directory
             workspace_result = await self.mcp_agent.call_tool(

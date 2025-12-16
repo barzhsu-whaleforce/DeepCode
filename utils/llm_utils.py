@@ -7,12 +7,119 @@ and reduce code duplication across the project.
 
 import os
 import yaml
-from typing import Any, Type, Dict, Tuple
+from typing import Any, Type, Dict, Tuple, Optional
 
 # Import LLM classes
 from mcp_agent.workflows.llm.augmented_llm_anthropic import AnthropicAugmentedLLM
 from mcp_agent.workflows.llm.augmented_llm_openai import OpenAIAugmentedLLM
 from mcp_agent.workflows.llm.augmented_llm_google import GoogleAugmentedLLM
+
+# Cache for task model configuration to avoid repeated file reads
+_task_model_cache: Optional[Dict] = None
+_task_model_cache_mtime: float = 0
+
+
+def get_model_for_task(
+    task_name: str, config_path: str = "mcp_agent.config.yaml"
+) -> Dict[str, Any]:
+    """
+    Get the model configuration for a specific task based on task_models config.
+
+    This enables multi-model support where different tasks can use different models
+    to optimize for cost, speed, or quality based on task complexity.
+
+    Args:
+        task_name: The task identifier (e.g., 'research_analyzer', 'code_implementation')
+        config_path: Path to the main configuration file
+
+    Returns:
+        Dict containing:
+        - provider: 'openai', 'google', or 'anthropic'
+        - model: The model name to use
+        - api_type: 'chat' or 'responses' (for OpenAI models)
+        - llm_class: The appropriate LLM class for the provider
+        - fallback: Boolean indicating if this is a fallback configuration
+    """
+    global _task_model_cache, _task_model_cache_mtime
+
+    # Map providers to LLM classes
+    provider_class_map = {
+        "openai": OpenAIAugmentedLLM,
+        "google": GoogleAugmentedLLM,
+        "anthropic": AnthropicAugmentedLLM,
+    }
+
+    # Default fallback configuration
+    default_config = {
+        "provider": "openai",
+        "model": None,  # Will use default from openai config
+        "api_type": "responses",
+        "llm_class": OpenAIAugmentedLLM,
+        "fallback": True,
+    }
+
+    try:
+        if not os.path.exists(config_path):
+            print(f"⚙️ Config file {config_path} not found, using default model for {task_name}")
+            return default_config
+
+        # Check if cache is valid (file hasn't been modified)
+        current_mtime = os.path.getmtime(config_path)
+        if _task_model_cache is not None and current_mtime == _task_model_cache_mtime:
+            task_models = _task_model_cache
+        else:
+            with open(config_path, "r", encoding="utf-8") as f:
+                config = yaml.safe_load(f)
+            task_models = config.get("task_models", {})
+            _task_model_cache = task_models
+            _task_model_cache_mtime = current_mtime
+
+        # Search for the task in all tiers
+        for tier_name, tier_config in task_models.items():
+            if not isinstance(tier_config, dict):
+                continue
+            tasks = tier_config.get("tasks", [])
+            if task_name in tasks:
+                provider = tier_config.get("provider", "openai")
+                model = tier_config.get("model")
+                api_type = tier_config.get("api_type", "chat")
+                llm_class = provider_class_map.get(provider, OpenAIAugmentedLLM)
+
+                result = {
+                    "provider": provider,
+                    "model": model,
+                    "api_type": api_type,
+                    "llm_class": llm_class,
+                    "fallback": False,
+                    "tier": tier_name,
+                }
+                print(f"⚙️ Task '{task_name}' -> {tier_name} tier: {provider}/{model}")
+                return result
+
+        # Task not found in any tier, use default
+        print(f"⚙️ Task '{task_name}' not configured, using default model")
+        return default_config
+
+    except Exception as e:
+        print(f"⚠️ Error reading task model config for '{task_name}': {e}")
+        return default_config
+
+
+def get_llm_class_for_task(
+    task_name: str, config_path: str = "mcp_agent.config.yaml"
+) -> Type[Any]:
+    """
+    Convenience function to get just the LLM class for a task.
+
+    Args:
+        task_name: The task identifier
+        config_path: Path to the configuration file
+
+    Returns:
+        The LLM class (OpenAIAugmentedLLM, GoogleAugmentedLLM, or AnthropicAugmentedLLM)
+    """
+    config = get_model_for_task(task_name, config_path)
+    return config["llm_class"]
 
 
 def get_preferred_llm_class(config_path: str = "mcp_agent.secrets.yaml") -> Type[Any]:
