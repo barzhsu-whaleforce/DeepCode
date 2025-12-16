@@ -1,0 +1,8 @@
+{"level":"INFO","timestamp":"2025-12-16T17:40:37.396712","namespace":"mcp_agent.core.context","message":"Configuring logger with level: info"}
+{"level":"INFO","timestamp":"2025-12-16T17:40:37.419407","namespace":"mcp_agent.cli_agent_orchestration","message":"Loading subagents from configuration..."}
+{"level":"INFO","timestamp":"2025-12-16T17:40:37.419616","namespace":"mcp_agent.cli_agent_orchestration","message":"MCPApp initialized","data":{"data":{"progress_action":"Running","target":"cli_agent_orchestration","agent_name":"mcp_application_loop","session_id":"b7dfcbe7-f711-424c-b25d-7ebb9c218bcb"}}}
+{"level":"INFO","timestamp":"2025-12-16T17:40:39.488885","namespace":"mcp_agent.core.context","message":"Configuring logger with level: info"}
+{"level":"INFO","timestamp":"2025-12-16T17:40:39.497446","namespace":"mcp_agent.cli_agent_orchestration","message":"Loading subagents from configuration..."}
+{"level":"INFO","timestamp":"2025-12-16T17:40:39.497607","namespace":"mcp_agent.cli_agent_orchestration","message":"MCPApp initialized","data":{"data":{"progress_action":"Running","target":"cli_agent_orchestration","agent_name":"mcp_application_loop","session_id":"99b06856-be6b-4734-bac2-e72cc49b79e3"}}}
+{"level":"INFO","timestamp":"2025-12-16T17:40:42.802087","namespace":"mcp_agent.cli_agent_orchestration","message":"MCPApp cleanup","data":{"data":{"progress_action":"Finished","target":"cli_agent_orchestration","agent_name":"mcp_application_loop"}}}
+{"level":"INFO","timestamp":"2025-12-16T17:40:42.804110","namespace":"mcp_agent.mcp.mcp_connection_manager","message":"bocha-mcp: Up and running with a persistent connection!"}

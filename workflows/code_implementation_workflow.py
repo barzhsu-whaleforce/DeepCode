@@ -21,6 +21,60 @@ import yaml
 from pathlib import Path
 from typing import Dict, Any, Optional, List
 
+
+def extract_tool_result_content(result: Any) -> Any:
+    """
+    Extract content from MCP CallToolResult or other result types.
+
+    Handles:
+    - CallToolResult objects (with content attribute containing list of ContentBlock)
+    - String results (JSON or plain text)
+    - Dict results (direct dictionary)
+    - Other types (return as-is)
+
+    Args:
+        result: The result from an MCP tool call
+
+    Returns:
+        Extracted content as dict, string, or original type
+    """
+    # Handle CallToolResult objects
+    if hasattr(result, 'content'):
+        content_list = result.content
+        if isinstance(content_list, list) and len(content_list) > 0:
+            # Extract text from first TextContent block
+            first_content = content_list[0]
+            if hasattr(first_content, 'text'):
+                text_content = first_content.text
+                # Try to parse as JSON
+                try:
+                    return json.loads(text_content)
+                except (json.JSONDecodeError, TypeError):
+                    return text_content
+            elif hasattr(first_content, 'type') and first_content.type == 'text':
+                # Alternative structure
+                text_content = getattr(first_content, 'text', str(first_content))
+                try:
+                    return json.loads(text_content)
+                except (json.JSONDecodeError, TypeError):
+                    return text_content
+        # Return empty dict if content list is empty
+        return {}
+
+    # Handle string results
+    if isinstance(result, str):
+        try:
+            return json.loads(result)
+        except (json.JSONDecodeError, TypeError):
+            return result
+
+    # Handle dict results directly
+    if isinstance(result, dict):
+        return result
+
+    # Return as-is for other types
+    return result
+
 # MCP Agent imports
 from mcp_agent.agents.agent import Agent
 
@@ -1288,11 +1342,10 @@ Requirements:
                 history_result = await self.mcp_agent.call_tool(
                     "get_operation_history", {"last_n": 30}
                 )
-                history_data = (
-                    json.loads(history_result)
-                    if isinstance(history_result, str)
-                    else history_result
-                )
+                # Use extract_tool_result_content to handle CallToolResult objects
+                history_data = extract_tool_result_content(history_result)
+                if not isinstance(history_data, dict):
+                    history_data = {"total_operations": 0, "history": []}
             else:
                 history_data = {"total_operations": 0, "history": []}
 

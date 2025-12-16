@@ -1,0 +1,15 @@
+{"level":"INFO","timestamp":"2025-12-16T17:29:48.427465","namespace":"mcp_agent.core.context","message":"Configuring logger with level: info"}
+{"level":"INFO","timestamp":"2025-12-16T17:29:48.483936","namespace":"mcp_agent.cli_agent_orchestration","message":"Loading subagents from configuration..."}
+{"level":"INFO","timestamp":"2025-12-16T17:29:48.484083","namespace":"mcp_agent.cli_agent_orchestration","message":"MCPApp initialized","data":{"data":{"progress_action":"Running","target":"cli_agent_orchestration","agent_name":"mcp_application_loop","session_id":"1a744450-6bcb-49aa-a0de-231629405833"}}}
+{"level":"INFO","timestamp":"2025-12-16T17:29:50.577839","namespace":"mcp_agent.core.context","message":"Configuring logger with level: info"}
+{"level":"INFO","timestamp":"2025-12-16T17:29:50.587825","namespace":"mcp_agent.cli_agent_orchestration","message":"MCPApp initialized","data":{"data":{"progress_action":"Running","target":"cli_agent_orchestration","agent_name":"mcp_application_loop","session_id":"febd0a0b-5f1f-4ed5-ac08-b3060182d7bb"}}}
+{"level":"INFO","timestamp":"2025-12-16T17:29:56.905580","namespace":"mcp_agent.cli_agent_orchestration","message":"MCPApp cleanup","data":{"data":{"progress_action":"Finished","target":"cli_agent_orchestration","agent_name":"mcp_application_loop"}}}
+{"level":"INFO","timestamp":"2025-12-16T17:29:50.587620","namespace":"mcp_agent.cli_agent_orchestration","message":"Loading subagents from configuration..."}
+{"level":"INFO","timestamp":"2025-12-16T17:29:56.907340","namespace":"mcp_agent.mcp.mcp_connection_manager","message":"bocha-mcp: Up and running with a persistent connection!"}
+{"level":"INFO","timestamp":"2025-12-16T17:29:57.459232","namespace":"mcp_agent.workflows.llm.augmented_llm_openai.ResearchAnalyzerAgent","message":"Using reasoning model 'gpt-5.2' with 'high' reasoning effort"}
+{"level":"ERROR","timestamp":"2025-12-16T17:29:58.681538","namespace":"mcp_agent.executor.executor","message":"Error executing task: Error code: 404 - {'error': {'code': '404', 'message': 'Resource not found'}}"}
+{"level":"ERROR","timestamp":"2025-12-16T17:29:58.681633","namespace":"mcp_agent.workflows.llm.augmented_llm_openai.ResearchAnalyzerAgent","message":"Error: Error code: 404 - {'error': {'code': '404', 'message': 'Resource not found'}}"}
+{"level":"INFO","timestamp":"2025-12-16T17:29:58.682028","namespace":"mcp_agent.mcp.mcp_aggregator.ResearchAnalyzerAgent","message":"Last aggregator closing, shutting down all persistent connections..."}
+{"level":"INFO","timestamp":"2025-12-16T17:29:58.682308","namespace":"mcp_agent.mcp.mcp_connection_manager","message":"Disconnecting all persistent server connections..."}
+{"level":"INFO","timestamp":"2025-12-16T17:29:58.684037","namespace":"mcp_agent.mcp.mcp_connection_manager","message":"bocha-mcp: Requesting shutdown..."}
+{"level":"INFO","timestamp":"2025-12-16T17:29:58.885374","namespace":"mcp_agent.mcp.mcp_connection_manager","message":"All persistent server connections signaled to disconnect."}

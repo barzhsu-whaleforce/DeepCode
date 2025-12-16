@@ -689,12 +689,15 @@ async def run_code_analyzer(
     agent_config = get_adaptive_agent_config(use_segmentation, search_server_names)
     prompts = get_adaptive_prompts(use_segmentation)
 
+    # Get the configured search server (bocha-mcp or other)
+    search_server = get_default_search_server()
+
     if paper_content:
         agent_config = {
             "concept_analysis": [],
-            "algorithm_analysis": ["brave"],
+            "algorithm_analysis": [search_server],
             "code_planner": [
-                "brave"
+                search_server
             ],  # Empty list instead of None - code planner doesn't need tools when paper content is provided
         }
         # agent_config = {
@@ -705,8 +708,8 @@ async def run_code_analyzer(
     else:
         agent_config = {
             "concept_analysis": ["filesystem"],
-            "algorithm_analysis": ["brave", "filesystem"],
-            "code_planner": ["brave", "filesystem"],
+            "algorithm_analysis": [search_server, "filesystem"],
+            "code_planner": [search_server, "filesystem"],
         }
 
     print(f"   Agent configurations: {agent_config}")
@@ -749,7 +752,7 @@ async def run_code_analyzer(
             "document-segmentation": {"read_document_segments", "get_document_overview"}
             if not paper_content
             else set(),  # Empty if paper already loaded
-            # "brave" not in filter = all brave tools available for searching
+            # search server not in filter = all search tools available
         }
     else:
         max_tokens_limit = base_max_tokens
@@ -762,7 +765,7 @@ async def run_code_analyzer(
         # Traditional mode: No filesystem tools needed (paper content already provided)
         if paper_content:
             tool_filter = {
-                # Only brave search available - no filesystem tools needed
+                # Only search tools available - no filesystem tools needed
             }
         else:
             tool_filter = {
@@ -796,7 +799,7 @@ Based on this paper, generate a comprehensive code reproduction plan that includ
 2. All algorithms, formulas, and implementation details
 3. Detailed file structure and implementation roadmap
 
-You may use web search (brave_web_search) if you need clarification on algorithms, methods, or concepts.
+You may use web search tools if you need clarification on algorithms, methods, or concepts.
 
 The goal is to create a reproduction plan detailed enough for independent implementation."""
     else:

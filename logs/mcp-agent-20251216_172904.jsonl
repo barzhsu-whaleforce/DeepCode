@@ -1,0 +1,11 @@
+{"level":"INFO","timestamp":"2025-12-16T17:29:04.057139","namespace":"mcp_agent.core.context","message":"Configuring logger with level: info"}
+{"level":"INFO","timestamp":"2025-12-16T17:29:04.084428","namespace":"mcp_agent.paper_to_code","message":"Loading subagents from configuration..."}
+{"level":"INFO","timestamp":"2025-12-16T17:29:04.084650","namespace":"mcp_agent.paper_to_code","message":"MCPApp initialized","data":{"data":{"progress_action":"Running","target":"paper_to_code","agent_name":"mcp_application_loop","session_id":"4710e72a-d13d-4caf-8f78-98af553efa11"}}}
+{"level":"INFO","timestamp":"2025-12-16T17:29:05.010718","namespace":"mcp_agent.mcp.mcp_connection_manager","message":"bocha-mcp: Up and running with a persistent connection!"}
+{"level":"INFO","timestamp":"2025-12-16T17:29:05.413262","namespace":"mcp_agent.workflows.llm.augmented_llm_openai.ResearchAnalyzerAgent","message":"Using reasoning model 'gpt-5.2' with 'high' reasoning effort"}
+{"level":"ERROR","timestamp":"2025-12-16T17:29:06.427965","namespace":"mcp_agent.executor.executor","message":"Error executing task: Error code: 404 - {'error': {'code': '404', 'message': 'Resource not found'}}"}
+{"level":"INFO","timestamp":"2025-12-16T17:29:06.428675","namespace":"mcp_agent.mcp.mcp_aggregator.ResearchAnalyzerAgent","message":"Last aggregator closing, shutting down all persistent connections..."}
+{"level":"ERROR","timestamp":"2025-12-16T17:29:06.428087","namespace":"mcp_agent.workflows.llm.augmented_llm_openai.ResearchAnalyzerAgent","message":"Error: Error code: 404 - {'error': {'code': '404', 'message': 'Resource not found'}}"}
+{"level":"INFO","timestamp":"2025-12-16T17:29:06.429005","namespace":"mcp_agent.mcp.mcp_connection_manager","message":"Disconnecting all persistent server connections..."}
+{"level":"INFO","timestamp":"2025-12-16T17:29:06.431073","namespace":"mcp_agent.mcp.mcp_connection_manager","message":"bocha-mcp: Requesting shutdown..."}
+{"level":"INFO","timestamp":"2025-12-16T17:29:06.632364","namespace":"mcp_agent.mcp.mcp_connection_manager","message":"All persistent server connections signaled to disconnect."}

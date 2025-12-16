@@ -1,0 +1,9 @@
+{"level":"INFO","timestamp":"2025-12-16T17:33:25.480424","namespace":"mcp_agent.core.context","message":"Configuring logger with level: info"}
+{"level":"INFO","timestamp":"2025-12-16T17:33:25.508669","namespace":"mcp_agent.cli_agent_orchestration","message":"Loading subagents from configuration..."}
+{"level":"INFO","timestamp":"2025-12-16T17:33:27.607369","namespace":"mcp_agent.core.context","message":"Configuring logger with level: info"}
+{"level":"INFO","timestamp":"2025-12-16T17:33:25.508874","namespace":"mcp_agent.cli_agent_orchestration","message":"MCPApp initialized","data":{"data":{"progress_action":"Running","target":"cli_agent_orchestration","agent_name":"mcp_application_loop","session_id":"72d8b4fd-50d7-47ea-8667-1cf70cff4b83"}}}
+{"level":"INFO","timestamp":"2025-12-16T17:33:27.614846","namespace":"mcp_agent.cli_agent_orchestration","message":"MCPApp initialized","data":{"data":{"progress_action":"Running","target":"cli_agent_orchestration","agent_name":"mcp_application_loop","session_id":"cc6f4a7a-8e37-40ad-be67-03e8d483dd4f"}}}
+{"level":"INFO","timestamp":"2025-12-16T17:33:27.614692","namespace":"mcp_agent.cli_agent_orchestration","message":"Loading subagents from configuration..."}
+{"level":"INFO","timestamp":"2025-12-16T17:33:30.907956","namespace":"mcp_agent.cli_agent_orchestration","message":"MCPApp cleanup","data":{"data":{"progress_action":"Finished","target":"cli_agent_orchestration","agent_name":"mcp_application_loop"}}}
+{"level":"INFO","timestamp":"2025-12-16T17:33:30.910065","namespace":"mcp_agent.mcp.mcp_connection_manager","message":"bocha-mcp: Up and running with a persistent connection!"}
+{"level":"INFO","timestamp":"2025-12-16T17:33:31.429666","namespace":"mcp_agent.workflows.llm.augmented_llm_openai.ResearchAnalyzerAgent","message":"Using reasoning model 'gpt-5.2' with 'high' reasoning effort"}
