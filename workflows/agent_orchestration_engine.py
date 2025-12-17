@@ -30,6 +30,7 @@ import asyncio
 import json
 import os
 import re
+import subprocess
 import yaml
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
@@ -44,6 +45,10 @@ from prompts.code_prompts import (
     PAPER_DOWNLOADER_PROMPT,
     PAPER_REFERENCE_ANALYZER_PROMPT,
     CHAT_AGENT_PLANNING_PROMPT,
+    PAPER_CHINESE_SUMMARY_PROMPT,
+    RESOURCE_REQUIREMENTS_PROMPT,
+    VERIFICATION_SCRIPT_GENERATION_PROMPT,
+    GAP_ANALYSIS_REPORT_PROMPT,
 )
 from utils.file_processor import FileProcessor
 from workflows.code_implementation_workflow import CodeImplementationWorkflow
@@ -1672,6 +1677,433 @@ Please provide a detailed implementation plan that covers all aspects needed for
         raise
 
 
+# =============================================================================
+# Paper Report Enhancement Functions (Chinese Summary, Resource Requirements, Verification)
+# =============================================================================
+
+
+async def generate_chinese_paper_summary(
+    paper_dir: str,
+    initial_plan: str,
+    paper_content: str,
+    logger,
+) -> str:
+    """
+    Generate a detailed Chinese summary of the paper.
+
+    This function creates a comprehensive Traditional Chinese summary including
+    paper motivation, methodology, experimental setup, and key findings.
+
+    Args:
+        paper_dir: Directory containing paper files
+        initial_plan: The YAML-formatted implementation plan
+        paper_content: Original paper content (markdown/text)
+        logger: Logger instance for logging information
+
+    Returns:
+        str: Path to the generated Chinese summary file
+    """
+    try:
+        print("📝 Generating Chinese paper summary...")
+
+        # Create the summary agent
+        summary_agent = Agent(
+            name="ChineseSummaryAgent",
+            instruction="You are an expert at summarizing academic papers in Traditional Chinese with technical accuracy.",
+            server_names=[],  # No tools needed for this task
+        )
+
+        async with summary_agent:
+            # Use summary tier model (gemini-2.0-flash - fast and free)
+            task_config = get_model_for_task("chinese_summary")
+            summarizer = await summary_agent.attach_llm(task_config["llm_class"])
+            print(f"✅ LLM attached: {task_config['model']}")
+
+            # Prepare the prompt with paper content
+            formatted_message = PAPER_CHINESE_SUMMARY_PROMPT.format(
+                paper_content=paper_content[:50000],  # Limit content size
+                implementation_plan=initial_plan[:20000],  # Include plan for context
+            )
+
+            summary_params = RequestParams(
+                model=task_config["model"],
+                maxTokens=8192,
+                temperature=0.3,
+            )
+
+            print("🔄 Generating Chinese summary...")
+            raw_result = await summarizer.generate_str(
+                message=formatted_message, request_params=summary_params
+            )
+
+            if not raw_result:
+                raise ValueError("Chinese summary generation returned empty result")
+
+            # Save the summary
+            summary_path = os.path.join(paper_dir, "paper_summary_zh.md")
+            with open(summary_path, "w", encoding="utf-8") as f:
+                f.write(raw_result)
+
+            print(f"✅ Chinese summary saved to: {summary_path}")
+            print(f"   Summary length: {len(raw_result)} characters")
+
+            # Log to logger
+            if hasattr(logger, "log_response"):
+                logger.log_response(
+                    raw_result[:500], model="ChineseSummaryAgent", agent="ChineseSummaryAgent"
+                )
+
+            return summary_path
+
+    except Exception as e:
+        print(f"❌ generate_chinese_paper_summary failed: {e}")
+        # Create a minimal error summary file
+        error_path = os.path.join(paper_dir, "paper_summary_zh.md")
+        with open(error_path, "w", encoding="utf-8") as f:
+            f.write(f"# 中文摘要生成失敗\n\n錯誤訊息: {str(e)}")
+        return error_path
+
+
+async def generate_resource_requirements(
+    paper_dir: str,
+    initial_plan: str,
+    logger,
+) -> str:
+    """
+    Generate resource requirements and cost estimation document.
+
+    This function analyzes the implementation plan and generates a comprehensive
+    resource requirements document including:
+    - Hardware requirements (GPU, CPU, Storage)
+    - API cost estimates (OpenAI, Anthropic, etc.)
+    - Cloud computing cost estimates
+    - Dataset requirements
+
+    Args:
+        paper_dir: Directory containing paper files
+        initial_plan: The YAML-formatted implementation plan
+        logger: Logger instance for logging information
+
+    Returns:
+        str: Path to the generated resource requirements file
+    """
+    try:
+        print("💰 Generating resource requirements and cost estimation...")
+
+        # Create the resource estimation agent
+        resource_agent = Agent(
+            name="ResourceEstimationAgent",
+            instruction="You are an expert at estimating computational and API resources for ML projects.",
+            server_names=[],  # No tools needed
+        )
+
+        async with resource_agent:
+            # Use simple tier model (gpt-4o-mini - fast and cheap)
+            task_config = get_model_for_task("resource_processor")
+            estimator = await resource_agent.attach_llm(task_config["llm_class"])
+            print(f"✅ LLM attached: {task_config['model']}")
+
+            # Prepare the prompt
+            formatted_message = RESOURCE_REQUIREMENTS_PROMPT.format(
+                implementation_plan=initial_plan
+            )
+
+            resource_params = RequestParams(
+                model=task_config["model"],
+                maxTokens=4096,
+                temperature=0.2,
+            )
+
+            print("🔄 Analyzing resource requirements...")
+            raw_result = await estimator.generate_str(
+                message=formatted_message, request_params=resource_params
+            )
+
+            if not raw_result:
+                raise ValueError("Resource requirements generation returned empty result")
+
+            # Save the requirements document
+            requirements_path = os.path.join(paper_dir, "resource_requirements.md")
+            with open(requirements_path, "w", encoding="utf-8") as f:
+                f.write(raw_result)
+
+            print(f"✅ Resource requirements saved to: {requirements_path}")
+
+            # Log to logger
+            if hasattr(logger, "log_response"):
+                logger.log_response(
+                    raw_result[:500], model="ResourceEstimationAgent", agent="ResourceEstimationAgent"
+                )
+
+            return requirements_path
+
+    except Exception as e:
+        print(f"❌ generate_resource_requirements failed: {e}")
+        # Create a minimal error document
+        error_path = os.path.join(paper_dir, "resource_requirements.md")
+        with open(error_path, "w", encoding="utf-8") as f:
+            f.write(f"# 資源需求估算失敗\n\n錯誤訊息: {str(e)}")
+        return error_path
+
+
+async def generate_verification_script(
+    paper_dir: str,
+    initial_plan: str,
+    paper_content: str,
+    code_directory: str,
+    logger,
+) -> str:
+    """
+    Generate a verification script to compare implementation results with paper claims.
+
+    This function creates a Python script that:
+    - Extracts expected metrics from the paper
+    - Runs the implementation
+    - Compares results with paper claims
+    - Outputs a JSON report
+
+    Args:
+        paper_dir: Directory containing paper files
+        initial_plan: The YAML-formatted implementation plan
+        paper_content: Original paper content
+        code_directory: Path to the generated code
+        logger: Logger instance for logging information
+
+    Returns:
+        str: Path to the generated verification script
+    """
+    try:
+        print("🔬 Generating verification script...")
+
+        # Create the verification script agent
+        verification_agent = Agent(
+            name="VerificationScriptAgent",
+            instruction="You are an expert at writing Python verification scripts for ML implementations.",
+            server_names=[],  # No tools needed
+        )
+
+        async with verification_agent:
+            # Use complex tier model (gpt-5.1-codex-max - high quality code generation)
+            task_config = get_model_for_task("code_implementation")
+            script_generator = await verification_agent.attach_llm(task_config["llm_class"])
+            print(f"✅ LLM attached: {task_config['model']}")
+
+            # Prepare the prompt
+            formatted_message = VERIFICATION_SCRIPT_GENERATION_PROMPT.format(
+                paper_content=paper_content[:30000],
+                implementation_plan=initial_plan[:15000],
+                code_directory=code_directory,
+            )
+
+            script_params = RequestParams(
+                model=task_config["model"],
+                maxTokens=8192,
+                temperature=0.1,  # Low temperature for precise code
+            )
+
+            print("🔄 Generating verification script...")
+            raw_result = await script_generator.generate_str(
+                message=formatted_message, request_params=script_params
+            )
+
+            if not raw_result:
+                raise ValueError("Verification script generation returned empty result")
+
+            # Extract Python code from the response
+            script_content = raw_result
+            if "```python" in raw_result:
+                # Extract code between ```python and ```
+                import re
+                code_match = re.search(r"```python\s*(.*?)\s*```", raw_result, re.DOTALL)
+                if code_match:
+                    script_content = code_match.group(1)
+
+            # Save the verification script
+            script_path = os.path.join(paper_dir, "verify_implementation.py")
+            with open(script_path, "w", encoding="utf-8") as f:
+                f.write(script_content)
+
+            print(f"✅ Verification script saved to: {script_path}")
+
+            # Log to logger
+            if hasattr(logger, "log_response"):
+                logger.log_response(
+                    script_content[:500], model="VerificationScriptAgent", agent="VerificationScriptAgent"
+                )
+
+            return script_path
+
+    except Exception as e:
+        print(f"❌ generate_verification_script failed: {e}")
+        # Create a minimal error script
+        error_path = os.path.join(paper_dir, "verify_implementation.py")
+        with open(error_path, "w", encoding="utf-8") as f:
+            f.write(f'''"""
+Verification Script Generation Failed
+Error: {str(e)}
+"""
+
+import json
+
+def main():
+    result = {{
+        "status": "error",
+        "error": "Verification script generation failed: {str(e)}"
+    }}
+    print(json.dumps(result, indent=2))
+
+if __name__ == "__main__":
+    main()
+''')
+        return error_path
+
+
+async def run_verification_and_generate_report(
+    paper_dir: str,
+    script_path: str,
+    logger,
+    timeout: int = 300,
+) -> str:
+    """
+    Execute the verification script and generate a gap analysis report.
+
+    This function:
+    1. Runs the verification script
+    2. Collects results into JSON
+    3. Uses LLM to generate a comprehensive gap analysis report
+
+    Args:
+        paper_dir: Directory containing paper files
+        script_path: Path to the verification script
+        logger: Logger instance for logging information
+        timeout: Maximum execution time in seconds (default: 300)
+
+    Returns:
+        str: Path to the generated gap analysis report
+    """
+    try:
+        print("🔬 Running verification and generating gap analysis report...")
+
+        # Step 1: Execute the verification script
+        print(f"🏃 Executing verification script: {script_path}")
+        verification_results = {"status": "not_run", "metrics": [], "errors": []}
+
+        try:
+            result = subprocess.run(
+                ["python", script_path],
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                cwd=paper_dir,
+            )
+
+            # Try to parse JSON output from the script
+            if result.stdout:
+                try:
+                    verification_results = json.loads(result.stdout)
+                    print("✅ Verification script completed successfully")
+                except json.JSONDecodeError:
+                    verification_results = {
+                        "status": "completed",
+                        "raw_output": result.stdout,
+                        "return_code": result.returncode,
+                    }
+
+            if result.returncode != 0:
+                verification_results["status"] = "error"
+                verification_results["stderr"] = result.stderr
+                print(f"⚠️ Verification script returned non-zero exit code: {result.returncode}")
+
+        except subprocess.TimeoutExpired:
+            verification_results = {
+                "status": "timeout",
+                "error": f"Verification script timed out after {timeout} seconds",
+            }
+            print(f"⏱️ Verification script timed out after {timeout} seconds")
+        except FileNotFoundError:
+            verification_results = {
+                "status": "error",
+                "error": "Python interpreter not found or script does not exist",
+            }
+            print("❌ Failed to execute verification script")
+        except Exception as e:
+            verification_results = {
+                "status": "error",
+                "error": str(e),
+            }
+            print(f"❌ Verification script execution failed: {e}")
+
+        # Save verification results to JSON
+        results_path = os.path.join(paper_dir, "verification_results.json")
+        with open(results_path, "w", encoding="utf-8") as f:
+            json.dump(verification_results, f, indent=2, ensure_ascii=False)
+        print(f"💾 Verification results saved to: {results_path}")
+
+        # Step 2: Generate gap analysis report using LLM
+        print("📊 Generating gap analysis report...")
+
+        gap_agent = Agent(
+            name="GapAnalysisAgent",
+            instruction="You are an expert at analyzing ML implementation results and comparing them with paper claims.",
+            server_names=[],
+        )
+
+        async with gap_agent:
+            # Use simple tier model (gpt-4o-mini)
+            task_config = get_model_for_task("resource_processor")
+            analyzer = await gap_agent.attach_llm(task_config["llm_class"])
+            print(f"✅ LLM attached: {task_config['model']}")
+
+            # Read initial plan for context
+            initial_plan_path = os.path.join(paper_dir, "initial_plan.txt")
+            initial_plan = ""
+            if os.path.exists(initial_plan_path):
+                with open(initial_plan_path, "r", encoding="utf-8") as f:
+                    initial_plan = f.read()
+
+            # Prepare the prompt
+            formatted_message = GAP_ANALYSIS_REPORT_PROMPT.format(
+                verification_results=json.dumps(verification_results, indent=2, ensure_ascii=False),
+                implementation_plan=initial_plan[:10000] if initial_plan else "No implementation plan available",
+            )
+
+            report_params = RequestParams(
+                model=task_config["model"],
+                maxTokens=4096,
+                temperature=0.2,
+            )
+
+            raw_result = await analyzer.generate_str(
+                message=formatted_message, request_params=report_params
+            )
+
+            if not raw_result:
+                raise ValueError("Gap analysis report generation returned empty result")
+
+            # Save the gap analysis report
+            report_path = os.path.join(paper_dir, "verification_gap_analysis.md")
+            with open(report_path, "w", encoding="utf-8") as f:
+                f.write(raw_result)
+
+            print(f"✅ Gap analysis report saved to: {report_path}")
+
+            # Log to logger
+            if hasattr(logger, "log_response"):
+                logger.log_response(
+                    raw_result[:500], model="GapAnalysisAgent", agent="GapAnalysisAgent"
+                )
+
+            return report_path
+
+    except Exception as e:
+        print(f"❌ run_verification_and_generate_report failed: {e}")
+        # Create a minimal error report
+        error_path = os.path.join(paper_dir, "verification_gap_analysis.md")
+        with open(error_path, "w", encoding="utf-8") as f:
+            f.write(f"# 驗證與差距分析報告生成失敗\n\n錯誤訊息: {str(e)}")
+        return error_path
+
+
 async def execute_multi_agent_research_pipeline(
     input_source: str,
     logger,
@@ -1776,6 +2208,54 @@ async def execute_multi_agent_research_pipeline(
         # Phase 4: Code Planning Orchestration
         await orchestrate_code_planning_agent(dir_info, logger, progress_callback)
 
+        # Phase 4.5: Chinese Paper Summary Generation
+        if progress_callback:
+            progress_callback(55, "📝 Generating Chinese paper summary...")
+
+        print("📝 Phase 4.5: Generating Chinese paper summary...")
+        try:
+            # Read the initial plan for context
+            initial_plan = ""
+            if os.path.exists(dir_info["initial_plan_path"]):
+                with open(dir_info["initial_plan_path"], "r", encoding="utf-8") as f:
+                    initial_plan = f.read()
+
+            # Read paper content (markdown version)
+            paper_content = ""
+            paper_markdown_path = dir_info.get("markdown_path", "")
+            if paper_markdown_path and os.path.exists(paper_markdown_path):
+                with open(paper_markdown_path, "r", encoding="utf-8") as f:
+                    paper_content = f.read()
+
+            chinese_summary_path = await generate_chinese_paper_summary(
+                dir_info["paper_dir"],
+                initial_plan,
+                paper_content,
+                logger,
+            )
+            print(f"✅ Chinese summary generated: {chinese_summary_path}")
+        except Exception as e:
+            print(f"⚠️ Chinese summary generation failed (non-critical): {e}")
+
+        # Phase 4.7: Resource Requirements Generation
+        if progress_callback:
+            progress_callback(58, "💰 Generating resource requirements...")
+
+        print("💰 Phase 4.7: Generating resource requirements and cost estimation...")
+        try:
+            if not initial_plan and os.path.exists(dir_info["initial_plan_path"]):
+                with open(dir_info["initial_plan_path"], "r", encoding="utf-8") as f:
+                    initial_plan = f.read()
+
+            resource_requirements_path = await generate_resource_requirements(
+                dir_info["paper_dir"],
+                initial_plan,
+                logger,
+            )
+            print(f"✅ Resource requirements generated: {resource_requirements_path}")
+        except Exception as e:
+            print(f"⚠️ Resource requirements generation failed (non-critical): {e}")
+
         # Phase 5: Reference Intelligence (only when indexing is enabled)
         if enable_indexing:
             reference_result = await orchestrate_reference_intelligence_agent(
@@ -1822,6 +2302,48 @@ async def execute_multi_agent_research_pipeline(
             dir_info, logger, progress_callback, enable_indexing
         )
 
+        # Phase 9: Verification and Gap Analysis (only if implementation succeeded)
+        verification_report_path = None
+        if implementation_result["status"] == "success":
+            if progress_callback:
+                progress_callback(95, "🔬 Running verification and generating gap analysis...")
+
+            print("🔬 Phase 9: Generating verification script and running gap analysis...")
+            try:
+                # Read paper content and initial plan for verification script generation
+                paper_content = ""
+                paper_markdown_path = dir_info.get("markdown_path", "")
+                if paper_markdown_path and os.path.exists(paper_markdown_path):
+                    with open(paper_markdown_path, "r", encoding="utf-8") as f:
+                        paper_content = f.read()
+
+                initial_plan = ""
+                if os.path.exists(dir_info["initial_plan_path"]):
+                    with open(dir_info["initial_plan_path"], "r", encoding="utf-8") as f:
+                        initial_plan = f.read()
+
+                # Generate verification script
+                verification_script_path = await generate_verification_script(
+                    dir_info["paper_dir"],
+                    initial_plan,
+                    paper_content,
+                    implementation_result["code_directory"],
+                    logger,
+                )
+                print(f"✅ Verification script generated: {verification_script_path}")
+
+                # Run verification and generate gap analysis report
+                verification_report_path = await run_verification_and_generate_report(
+                    dir_info["paper_dir"],
+                    verification_script_path,
+                    logger,
+                    timeout=300,  # 5 minutes timeout
+                )
+                print(f"✅ Gap analysis report generated: {verification_report_path}")
+
+            except Exception as e:
+                print(f"⚠️ Verification phase failed (non-critical): {e}")
+
         # Final Status Report
         if enable_indexing:
             pipeline_summary = (
@@ -1850,6 +2372,29 @@ async def execute_multi_agent_research_pipeline(
             pipeline_summary += (
                 f"\n📁 Code generated in: {implementation_result['code_directory']}"
             )
+
+            # Add information about generated reports
+            pipeline_summary += "\n\n📊 Generated Reports:"
+            paper_dir = dir_info["paper_dir"]
+
+            # Check for Chinese summary
+            chinese_summary_file = os.path.join(paper_dir, "paper_summary_zh.md")
+            if os.path.exists(chinese_summary_file):
+                pipeline_summary += f"\n  📝 中文摘要: {chinese_summary_file}"
+
+            # Check for resource requirements
+            resource_req_file = os.path.join(paper_dir, "resource_requirements.md")
+            if os.path.exists(resource_req_file):
+                pipeline_summary += f"\n  💰 資源需求: {resource_req_file}"
+
+            # Check for verification results
+            if verification_report_path and os.path.exists(verification_report_path):
+                pipeline_summary += f"\n  🔬 差距分析: {verification_report_path}"
+
+            verification_script = os.path.join(paper_dir, "verify_implementation.py")
+            if os.path.exists(verification_script):
+                pipeline_summary += f"\n  🧪 驗證腳本: {verification_script}"
+
             return pipeline_summary
         elif implementation_result["status"] == "warning":
             pipeline_summary += (

@@ -1824,3 +1824,338 @@ complete_reproduction_plan:
 ```
 
 BE EXHAUSTIVE. Every algorithm, every formula, every parameter, every file should be specified in complete detail."""
+
+# =============================================================================
+# PAPER REPORT ENHANCEMENT PROMPTS (中文摘要、資源需求、驗證分析)
+# =============================================================================
+
+# Chinese Paper Summary Prompt / 中文論文摘要提示詞
+PAPER_CHINESE_SUMMARY_PROMPT = """你是一位專業的研究論文分析專家，需要生成一份詳細的中文論文摘要報告。
+
+# 輸入
+
+## 論文內容
+{paper_content}
+
+## 實作計劃
+{implementation_plan}
+
+# 輸出要求
+
+生成一份結構化的繁體中文摘要，包含以下章節：
+
+## 1. 論文基本資訊
+標題: "[中文翻譯]"
+原始標題: "[英文原標題]"
+作者: "[作者列表]"
+發表資訊: "[期刊/會議名稱及年份]"
+核心貢獻: "[一句話總結論文主要貢獻]"
+
+## 2. 研究動機與問題定義
+- 研究背景：該領域目前的發展狀況
+- 現有方法的局限性：為什麼需要新方法
+- 本文要解決的具體問題
+- 研究目標與預期成果
+
+## 3. 方法論詳解
+
+### 3.1 整體架構
+- 系統/模型的整體框架描述
+- 各模組的功能與相互關係
+- 資料流向說明
+
+### 3.2 核心演算法
+對每個主要演算法提供詳細說明：
+- 演算法名稱和目的
+- 輸入輸出規格
+- 步驟分解
+- 關鍵公式及其含義
+
+### 3.3 損失函數與優化
+- 損失函數的完整數學形式
+- 各項的物理意義與作用
+- 優化策略與技巧
+
+### 3.4 創新點分析
+- 與現有方法的主要差異
+- 技術創新的具體內容
+
+## 4. 實驗配置
+
+### 4.1 資料集
+- 資料集名稱、規模、特性
+- 預處理步驟
+- 訓練/驗證/測試分割
+
+### 4.2 超參數設定
+- 訓練參數（學習率、批次大小等）
+- 模型參數（架構細節）
+
+### 4.3 評估指標
+- 使用的評估指標及其定義
+- 指標的計算方式
+
+### 4.4 實驗環境
+- 硬體配置
+- 軟體環境
+
+## 5. 主要結果
+- 核心實驗結果表格
+- 與基線方法的比較
+- 消融實驗結論
+
+## 6. 實作重點提示
+- 關鍵實作細節
+- 建議的實現順序
+- 可能的困難與解決方案
+
+## 7. 結論與展望
+- 論文的主要結論
+- 方法的優勢與局限
+- 未來研究方向
+
+# 寫作風格要求
+1. 使用繁體中文
+2. 技術術語保留英文原文並加括號標註
+3. 所有數學公式需提供直觀的中文解釋
+4. 適當使用表格和列表增強可讀性
+5. 報告長度：約 3000-5000 字
+
+# 輸出格式
+直接輸出 Markdown 格式的報告。
+"""
+
+# Resource Requirements Prompt / 資源需求提示詞
+RESOURCE_REQUIREMENTS_PROMPT = """You are a technical resource analyst. Generate a comprehensive resource requirements document with cost estimates for implementing a research paper.
+
+# Input
+
+## Implementation Plan
+{implementation_plan}
+
+# Output Format
+
+Generate a structured resource requirements document in Markdown:
+
+# 資源需求清單 (Resource Requirements)
+
+## 1. 計算資源需求 (Computational Resources)
+
+### 1.1 GPU 需求
+- 訓練階段最低/建議 VRAM
+- 建議 GPU 型號
+- 預計訓練時間
+- 多 GPU 支援
+
+### 1.2 CPU 與記憶體
+- 最低/建議核心數
+- 最低/建議 RAM
+- 訓練峰值用量
+
+### 1.3 儲存空間
+- 模型檢查點
+- 資料集
+- 中間輸出
+- 總計建議
+
+## 2. 資料資源 (Data Resources)
+
+| 資料名稱 | 來源 | 大小 | 是否公開 | 取得方式 |
+|----------|------|------|----------|----------|
+| [dataset] | [source] | [size] | [yes/no] | [how] |
+
+## 3. API 金鑰需求 (API Keys Required)
+
+| 服務名稱 | 用途 | 必要性 | 取得方式 |
+|----------|------|--------|----------|
+| [api] | [purpose] | [required/optional] | [link] |
+
+## 4. 成本估算 (Cost Estimates)
+
+### 4.1 雲端計算成本
+- AWS/GCP 執行個體類型和費率
+- 預計使用時數
+- 預計總成本
+
+### 4.2 LLM API 成本 (如適用)
+- 模型、預計 Token 數、單價、預計成本
+
+### 4.3 資料 API 成本
+- API 服務、定價模式、預計用量、預計成本
+
+### 4.4 成本總結
+| 類別 | 最低成本 | 建議預算 |
+|------|----------|----------|
+| 雲端計算 | $X | $X |
+| API | $X | $X |
+| 總計 | $X | $X |
+
+## 5. 軟體依賴 (Software Dependencies)
+- 核心套件列表
+- 特殊需求（CUDA版本等）
+
+## 6. 開發時間估算 (Time Estimates)
+- 環境設置
+- 開發階段
+- 總計預估
+
+## 7. 成本優化建議 (Cost Optimization)
+- 降低計算成本策略
+- 替代方案
+
+Generate realistic estimates based on common ML workloads.
+"""
+
+# Verification Script Generation Prompt / 驗證腳本生成提示詞
+VERIFICATION_SCRIPT_GENERATION_PROMPT = """You are generating a verification script to validate a research paper implementation against the paper's claimed results.
+
+# Input
+
+## Paper Content
+{paper_content}
+
+## Implementation Plan
+{implementation_plan}
+
+## Code Directory
+{code_directory}
+
+# Goal
+Create a complete, executable Python script that:
+1. Extracts the paper's claimed metrics
+2. Runs the implementation
+3. Collects actual results
+4. Compares and generates a gap analysis
+
+# Script Requirements
+
+The script should:
+1. Define PAPER_METRICS dictionary with all claimed metrics from the paper
+2. Implement VerificationRunner class to run tests
+3. Compare results and generate JSON output
+4. Be executable with `python verify_implementation.py --output results.json`
+
+# Key Components to Implement
+
+1. **PAPER_METRICS**: Extract ALL metrics from paper's tables/figures
+   - Include exact values claimed
+   - Reference the source (Table X, Figure Y)
+   - Set reasonable tolerance values
+
+2. **_run_implementation_tests()**: Import and run the generated code
+   - Handle import errors gracefully
+   - Collect metrics from execution
+
+3. **_compare_with_paper()**: Calculate gaps between claimed and actual results
+   - Compute absolute and relative differences
+   - Determine pass/fail status
+
+4. **main()**: CLI interface for running verification
+   - Accept output file path
+   - Accept code directory
+   - Support quick mode for fast testing
+
+Generate a COMPLETE, EXECUTABLE script customized for this specific paper.
+The script should handle errors gracefully and produce a JSON output file.
+"""
+
+# Gap Analysis Report Prompt / 差距分析報告提示詞
+GAP_ANALYSIS_REPORT_PROMPT = """You are analyzing verification results and generating a comprehensive gap analysis report comparing implementation results with paper claims.
+
+# Input
+
+## Verification Results (JSON)
+{verification_results}
+
+## Implementation Plan
+{implementation_plan}
+
+# Output Format
+
+Generate a detailed Markdown report:
+
+# 實現結果與論文差距分析報告
+
+## 執行摘要 (Executive Summary)
+- **整體狀態**: [通過/失敗/部分通過]
+- **成功復現指標數**: [X/Y]
+- **主要差距**: [description]
+
+## 指標比較表格
+
+| 指標名稱 | 論文結果 | 實現結果 | 差距 | 狀態 |
+|----------|----------|----------|------|------|
+| [metric] | [value] | [value] | [gap] | ✅/⚠️/❌ |
+
+## 差距詳細分析
+
+### [指標名稱]
+- 論文聲稱值: [value]
+- 來源: [Table X / Figure Y]
+- 實現結果: [value]
+- 差距: [diff] ([percent]%)
+
+**可能原因分析**:
+1. [原因1]
+2. [原因2]
+
+**建議修復方案**:
+1. [方案1]
+2. [方案2]
+
+## 實現品質評估
+
+### 成功之處
+- [positive finding]
+
+### 需要改進之處
+- [area for improvement]
+
+### 缺失實現
+- [missing component]: [impact]
+
+## 差距根因分析
+
+### 資料相關
+- 資料集差異
+- 預處理差異
+
+### 模型相關
+- 架構差異
+- 參數差��
+
+### 訓練相關
+- 超參數差異
+- 訓練時長
+
+### 評估相關
+- 指標計算方式
+- 評估資料集
+
+## 改進建議
+
+### 立即行動
+1. [action item with priority]
+
+### 後續改進
+1. [improvement]
+
+## 復現信心評分
+
+| 評估面向 | 分數 (1-10) | 說明 |
+|----------|-------------|------|
+| 方法論復現 | [X] | [note] |
+| 結果復現 | [X] | [note] |
+| 代碼品質 | [X] | [note] |
+| 總體評分 | [X] | [assessment] |
+
+## 驗證清單
+
+- [ ] 資料集一致性確認
+- [ ] 超參數一致性確認
+- [ ] 評估指標計算方式一致
+- [ ] 模型架構一致
+- [ ] 訓練過程一致
+
+Generate a thorough, actionable report with clear explanations and recommendations.
+"""

@@ -87,43 +87,34 @@ openai:
   reasoning_effort: medium
   retry_max_tokens: 8192
 planning_mode: traditional
-
-# Task-level model configuration for multi-model support
-# This allows different tasks to use different models for cost/quality optimization
 task_models:
-  # Tier 1: Simple tasks - fast and cheap (Azure gpt-4o-mini)
-  simple:
-    provider: openai
-    model: gpt-4o-mini
-    api_type: chat
-    tasks:
-      - research_analyzer
-      - resource_processor
-      - github_download
-      - structure_generator
-
-  # Tier 2: Medium tasks - balanced (Google Gemini - free tier)
-  medium:
-    provider: google
-    model: gemini-3-pro-preview
-    tasks:
-      - concept_analysis
-      - reference_analysis
-
-  # Tier 3: Complex tasks - high quality (Azure codex)
   complex:
-    provider: openai
-    model: gpt-5.1-codex-max
     api_type: responses
+    model: gpt-5.1-codex-max
+    provider: openai
     tasks:
-      - algorithm_analysis
-      - code_planning
-      - code_implementation
-      - chat_planning
-
-  # Summary tasks - fast and free (Google Flash)
-  summary:
+    - algorithm_analysis
+    - code_planning
+    - code_implementation
+    - chat_planning
+  medium:
+    model: gemini-3-pro-preview
     provider: google
-    model: gemini-2.0-flash
     tasks:
-      - memory_summary
+    - concept_analysis
+    - reference_analysis
+  simple:
+    api_type: chat
+    model: gpt-4o-mini
+    provider: openai
+    tasks:
+    - research_analyzer
+    - resource_processor
+    - github_download
+    - structure_generator
+  summary:
+    model: gemini-2.0-flash
+    provider: google
+    tasks:
+    - memory_summary
+    - chinese_summary
