@@ -65,3 +65,6 @@ run_indexer_with_filtering.py
 
 # Cline files
 memory-bank/
+
+# secrets
+mcp_agent.secrets.yaml
