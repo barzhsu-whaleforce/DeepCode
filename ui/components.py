@@ -7,9 +7,12 @@ the operational widgets required by the handlers.
 
 from __future__ import annotations
 
-import html
 import base64
+import html
+import io
+import os
 import sys
+import zipfile
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
@@ -46,6 +49,45 @@ def icon_img(name: str, size: int = 32, extra_style: str = "") -> str:
     if not data_uri:
         return ""
     return f'<img src="{data_uri}" alt="{name}" style="width:{size}px;height:{size}px;{extra_style}"/>'
+
+
+def _extract_code_directory(result: Any) -> Optional[str]:
+    if not isinstance(result, dict):
+        return None
+
+    repo_result = result.get("repo_result", "")
+    if not isinstance(repo_result, str):
+        return None
+
+    markers = ("Code generated in:", "Code directory:")
+    for line in repo_result.splitlines():
+        for marker in markers:
+            if marker in line:
+                candidate = line.split(marker, 1)[-1].strip()
+                if candidate:
+                    return candidate
+
+    return None
+
+
+def _build_zip_bytes(root_dir: str) -> Optional[bytes]:
+    if not root_dir or not os.path.isdir(root_dir):
+        return None
+
+    try:
+        root_name = os.path.basename(os.path.normpath(root_dir))
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+            for base_dir, _, files in os.walk(root_dir):
+                for filename in files:
+                    full_path = os.path.join(base_dir, filename)
+                    rel_path = os.path.relpath(full_path, root_dir)
+                    arcname = os.path.join(root_name, rel_path)
+                    zip_file.write(full_path, arcname)
+        buffer.seek(0)
+        return buffer.getvalue()
+    except Exception:
+        return None
 
 
 def clear_guided_answer_inputs():
@@ -358,6 +400,11 @@ def results_display_component(result: Any, task_counter: int):
         if is_success
         else result.get("error", "Unknown error occurred during processing.")
     )
+    zip_bytes = None
+    if is_success:
+        code_directory = _extract_code_directory(result)
+        if code_directory:
+            zip_bytes = _build_zip_bytes(code_directory)
 
     st.markdown('<div style="height: 2rem;"></div>', unsafe_allow_html=True)
     st.markdown("### 🚀 Operation Result")
@@ -384,13 +431,22 @@ def results_display_component(result: Any, task_counter: int):
                 """,
                 unsafe_allow_html=True,
             )
-            st.download_button(
-                label="📥 DOWNLOAD ARTIFACTS" if is_success else "📥 DOWNLOAD LOGS",
-                data=str(result),
-                file_name=f"deepcode_result_{task_counter}.json",
-                mime="application/json",
-                use_container_width=True,
-            )
+            if is_success and zip_bytes:
+                st.download_button(
+                    label="📥 DOWNLOAD ARTIFACTS",
+                    data=zip_bytes,
+                    file_name=f"deepcode_artifacts_{task_counter}.zip",
+                    mime="application/zip",
+                    use_container_width=True,
+                )
+            else:
+                st.download_button(
+                    label="📥 DOWNLOAD ARTIFACTS" if is_success else "📥 DOWNLOAD LOGS",
+                    data=str(result),
+                    file_name=f"deepcode_result_{task_counter}.json",
+                    mime="application/json",
+                    use_container_width=True,
+                )
 
 
 def system_status_component():
